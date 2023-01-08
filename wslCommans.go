@@ -47,7 +47,9 @@ func wslList() string {
 
 		name := strings.Trim(string(line[nameStart:stateStart]), " ")
 		status := strings.Trim(string(line[stateStart:versionStart]), " ")
-		wsl_version, _ := strconv.Atoi(strings.Trim(string(line[versionStart:]), " "))
+		wsl_versionStr := strings.Trim(string(line[versionStart:]), " ")
+		wsl_versionStr = strings.Replace(wsl_versionStr, "\r", "", 1)
+		wsl_version, _ := strconv.Atoi(wsl_versionStr)
 		wslLines = append(wslLines, wslLine{default_, name, status, wsl_version})
 	}
 
