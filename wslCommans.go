@@ -5,9 +5,18 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-func wslList() string {
+func (a *App) TerminateWsl(name string) {
+	err, _ := exec.Command("wsl", "-t", name).Output()
+	if err != nil {
+		runtime.LogError(a.ctx, string(err))
+	}
+}
+
+func (a *App) GetWslList() string {
 	type wslLine struct {
 		Default_    bool
 		Name        string

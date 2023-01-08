@@ -1,4 +1,4 @@
-module changeme
+module wsltool
 
 go 1.18
 

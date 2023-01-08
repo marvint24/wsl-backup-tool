@@ -1,9 +1,10 @@
 <script lang="ts">
   import {GetWslList} from '../wailsjs/go/main/App.js'
   import WslList from './WslList.svelte'
-  import {distros} from './store'
-  import refresh from './assets/refresh.svg'
+  import {distros,refresh} from './store'
+  import refreshsvg from './assets/refresh.svg'
   import sliders from './assets/sliders.svg'
+  import Testa from './Testa.svelte'
 
   function getWslDistros(): void {
     GetWslList().then((result)=> {
@@ -28,14 +29,22 @@
  
   getWslDistros()
 
+  $:{
+    if($refresh){
+      refreshWslList()
+      $refresh = false
+    }
+  }
+
 </script>
   
 <main>
   <section id="header">
     <div id="Settings" title="Settings"><img src="{sliders}" alt="sliders"><p>Settings</p>  </div>
-    <div id="Refresh" title="Refresh" on:click="{refreshWslList}" on:keydown><img class="{spinClass}" src="{refresh}" alt="refresh"></div>
+    <div id="Refresh" title="Refresh" on:click="{refreshWslList}" on:keydown><img class="{spinClass}" src="{refreshsvg}" alt="refresh"></div>
   </section>
   <WslList/>
+  <Testa/>
 </main>
 
 <style>

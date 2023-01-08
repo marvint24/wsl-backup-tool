@@ -1,27 +1,41 @@
 <script lang="ts">
-    // import { selectedDistro } from "./store";
-    import check from './assets/check.svg'
-    import terminal from './assets/terminal.svg'
-    import backup from './assets/backup.svg'
-    import list from './assets/list.svg'
-    import stop from './assets/stop.svg'
-    export var distroRow
+import check from './assets/check.svg'
+import terminal from './assets/terminal.svg'
+import backup from './assets/backup.svg'
+import list from './assets/list.svg'
+import stop from './assets/stop.svg'
+import {refresh} from './store'
+import {TerminateWsl} from '../wailsjs/go/main/App.js'
+export var distroRow
 
-    function openDistro(name:string){
+function openDistro(){
+    
+}
 
+function createBackup(){
+
+}
+
+function manageBackups(){
+
+}
+
+function terminate(){
+  TerminateWsl(distroRow.Name).then((err)=> {
+    if(err){
+        console.log("err"+err)
+    }else{
+        let i=0
+        let interval=setInterval(()=>{
+            if(i==15){
+                clearInterval(interval)
+            }
+            $refresh=true
+            i++
+        },1500)
     }
-
-    function createBackup(name:string){
-
-    }
-
-    function manageBackups(){
-
-    }
-
-    function terminate(name:string){
-        
-    }
+  })
+}
     
 </script>
 
@@ -41,8 +55,8 @@
             <img title="Open in terminal" src="{terminal}" alt="terminal">
             <img title="Backup" src="{backup}" alt="backup">
             <img title="Manage backups" src="{list}" alt="list">
-            {#if distroRow.Default_}
-                <img title="Terminate" src="{stop}" alt="stop">
+            {#if distroRow.Status==="Running"}
+                <img title="Terminate" on:click={terminate} on:keydown src="{stop}" alt="stop">
             {/if}
         </div>
     </td>
