@@ -66,3 +66,17 @@ func (a *App) GetWslList() string {
 
 	return string(jsonWsl)
 }
+
+func (a *App) CreateBackupFile() {
+	err, _ := exec.Command("wsl", "-t", name).Output()
+	if err != nil {
+		runtime.LogError(a.ctx, string(err))
+	}
+}
+
+func (a *App) LaunchDistro(terminal int, name string) {
+	err := exec.Command("cmd", "/c", "start", "wsl", "-d", name).Start()
+	if err != nil {
+		runtime.LogError(a.ctx, err.Error())
+	}
+}

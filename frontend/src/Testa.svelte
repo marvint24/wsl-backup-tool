@@ -1,11 +1,10 @@
 <script lang="ts">
-  import {SetBackupPath} from '../wailsjs/go/main/App.js'
+  import {SetBackupPath,LaunchDistro} from '../wailsjs/go/main/App.js'
 
 
-function joo():string{
-  console.log("aa")
-  SetBackupPath("aaaa").then()
-  return "hi"
+function joo(){
+  console.log("hi")
+  LaunchDistro(0,"Ubuntu").then()
 }
 
 </script>

@@ -24,8 +24,7 @@ func (a *App) init() {
 }
 
 type settingsType struct {
-	BackupPath      string
-	DefaultTerminal string
+	BackupPath string
 }
 
 func (settings *settingsType) toString() string {
@@ -45,12 +44,6 @@ func saveSettings(settings settingsType, a *App) {
 
 func (a *App) SetBackupPath(path string) {
 	currentSettings.BackupPath = path
-	saveSettings(currentSettings, a)
-}
-
-func (a *App) SetDefaultTerminal(selectNum int) {
-	terminals := []string{"pwsh", "wt", "powershell", "cmd"}
-	currentSettings.DefaultTerminal = terminals[selectNum]
 	saveSettings(currentSettings, a)
 }
 

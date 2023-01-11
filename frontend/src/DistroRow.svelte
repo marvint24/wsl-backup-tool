@@ -8,7 +8,7 @@ import {refresh} from './store'
 import {TerminateWsl} from '../wailsjs/go/main/App.js'
 export var distroRow
 
-function openDistro(){
+function launchDistro(){
     
 }
 
@@ -21,19 +21,15 @@ function manageBackups(){
 }
 
 function terminate(){
-  TerminateWsl(distroRow.Name).then((err)=> {
-    if(err){
-        console.log("err"+err)
-    }else{
-        let i=0
-        let interval=setInterval(()=>{
-            if(i==15){
-                clearInterval(interval)
-            }
-            $refresh=true
-            i++
-        },1500)
-    }
+  TerminateWsl(distroRow.Name).then(()=> {
+    let i=0
+    let interval=setInterval(()=>{
+        if(i==15){
+            clearInterval(interval)
+        }
+        $refresh=true
+        i++
+    },1500)
   })
 }
     
