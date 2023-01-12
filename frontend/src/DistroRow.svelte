@@ -5,11 +5,11 @@ import backup from './assets/backup.svg'
 import list from './assets/list.svg'
 import stop from './assets/stop.svg'
 import {refresh} from './store'
-import {TerminateWsl} from '../wailsjs/go/main/App.js'
+import {TerminateWsl,LaunchDistro} from '../wailsjs/go/main/App.js'
 export var distroRow
 
 function launchDistro(){
-    
+    LaunchDistro(distroRow.Name)
 }
 
 function createBackup(){
@@ -24,7 +24,7 @@ function terminate(){
   TerminateWsl(distroRow.Name).then(()=> {
     let i=0
     let interval=setInterval(()=>{
-        if(i==15){
+        if(i==3){
             clearInterval(interval)
         }
         $refresh=true
@@ -48,7 +48,7 @@ function terminate(){
     <td>{distroRow.Wsl_version}</td>
     <td>
         <div id="btns">
-            <img title="Open in terminal" src="{terminal}" alt="terminal">
+            <img title="Open in terminal" on:click={launchDistro} on:keydown src="{terminal}" alt="terminal">
             <img title="Backup" src="{backup}" alt="backup">
             <img title="Manage backups" src="{list}" alt="list">
             {#if distroRow.Status==="Running"}

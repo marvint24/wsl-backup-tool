@@ -1,5 +1,6 @@
 :root {
     --dark: #1b2636;
+    --dark-op: rgba(27, 38, 54, 0.87);
     --white: #d0f6ff;
     --green-light: rgba(1, 255, 246, 0.1);
     --green: rgba(1, 255, 246, 0.5);;

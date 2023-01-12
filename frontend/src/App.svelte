@@ -1,10 +1,20 @@
 <script lang="ts">
   import {GetWslList} from '../wailsjs/go/main/App.js'
   import WslList from './WslList.svelte'
-  import {distros,refresh} from './store'
+  import {distros,refresh,selectedWindow} from './store'
   import refreshsvg from './assets/refresh.svg'
   import sliders from './assets/sliders.svg'
   import Testa from './Testa.svelte'
+
+  import BackupCreate from './BackupCreate.svelte'
+  import BackupList from './BackupList.svelte'
+  import Settings from './Settings.svelte'
+
+  const imported = {
+    BackupCreate,
+    BackupList,
+    Settings
+  }
 
   function getWslDistros(): void {
     GetWslList().then((result)=> {
@@ -17,7 +27,7 @@
   }
 
   function openSettings(): void {
-
+    $selectedWindow="Settings"
   }
 
   var spinClass=""
@@ -39,8 +49,11 @@
 </script>
   
 <main>
+  {#if selectedWindow}
+    <svelte:component this={imported[$selectedWindow]} />
+  {/if}
   <section id="header">
-    <div id="Settings" title="Settings"><img src="{sliders}" alt="sliders"><p>Settings</p>  </div>
+    <div id="Settings" title="Settings" on:click="{openSettings}" on:keydown><img src="{sliders}" alt="sliders"><p>Settings</p>  </div>
     <div id="Refresh" title="Refresh" on:click="{refreshWslList}" on:keydown><img class="{spinClass}" src="{refreshsvg}" alt="refresh"></div>
   </section>
   <WslList/>

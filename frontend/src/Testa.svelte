@@ -4,7 +4,7 @@
 
 function joo(){
   console.log("hi")
-  LaunchDistro(0,"Ubuntu").then()
+  LaunchDistro("Ubuntu")
 }
 
 </script>

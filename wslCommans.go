@@ -10,9 +10,9 @@ import (
 )
 
 func (a *App) TerminateWsl(name string) {
-	err, _ := exec.Command("wsl", "-t", name).Output()
+	_, err := exec.Command("wsl", "-t", name).Output()
 	if err != nil {
-		runtime.LogError(a.ctx, string(err))
+		runtime.LogError(a.ctx, err.Error())
 	}
 }
 
@@ -67,15 +67,20 @@ func (a *App) GetWslList() string {
 	return string(jsonWsl)
 }
 
-func (a *App) CreateBackupFile() {
-	err, _ := exec.Command("wsl", "-t", name).Output()
+func (a *App) CreateBackupFile(name string, filename string) {
+	backupPath := currentSettings.BackupPath + name + filename
+	err, _ := exec.Command("wsl", "--export", name, ("\"" + backupPath + "\"")).Output()
 	if err != nil {
 		runtime.LogError(a.ctx, string(err))
 	}
 }
 
-func (a *App) LaunchDistro(terminal int, name string) {
-	err := exec.Command("cmd", "/c", "start", "wsl", "-d", name).Start()
+func (a *App) GetBackupFiles(name string) string {
+	return ""
+}
+
+func (a *App) LaunchDistro(name string) {
+	_, err := exec.Command("cmd", "/c", "start", "wsl", "-d", name, "--cd", "~").Output()
 	if err != nil {
 		runtime.LogError(a.ctx, err.Error())
 	}
