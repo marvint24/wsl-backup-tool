@@ -1,61 +1,108 @@
 <script lang="ts">
-  import folder from "./assets/folder.svg"
-  import {CreateBackupFile} from '../wailsjs/go/main/App.js'
+  import {CreateBackupFile,GetSettings} from '../wailsjs/go/main/App.js'
+  import {selectedWindow,selectedDistro} from './store'
  
-      
-  </script>
-  
-  
-  
-  <section>
+  let backupPath: string 
+  GetSettings().then((result)=>{
+    backupPath=JSON.parse(result).replaceBackupPath
+  })
 
-  </section>
+  var backupFilename: string
+  let now=new Date().toLocaleString()
+  .replaceAll("<","")
+  .replaceAll(">","")
+  .replaceAll(":","_")
+  .replaceAll("\"","")
+  .replaceAll("/","")
+  .replaceAll("\\","")
+  .replaceAll("|","")
+  .replaceAll("?","")
+  .replaceAll("*","")
+  backupFilename=`${now}.tar`
+
+  function close(){
+    $selectedWindow=null
+  }
+
+  function createBackupFile(){
+    CreateBackupFile($selectedDistro,backupFilename).then()
+    close()
+  }
+</script>
   
   
-  <style>
-  td>div>img{
-      cursor: pointer;
+  
+<section>
+  <div>
+    <div id="box">
+      <div id="heading">Create backup TAR-file for {$selectedDistro}</div>
+      <hr/>
+      <div class="text">Select name</div>
+      <input type="text" bind:value={backupFilename}>
+    </div>
+    <div id="row2">
+      <div id="mbtn" on:click="{createBackupFile}" on:keydown>OK</div>
+      <div id="mbtn" on:click="{close}" on:keydown>Cancel</div>
+    </div>
+  </div>
+</section>
+
+
+<style>
+  #mbtn{
+    font-size: 20px;
+    background-color: var(--green);
+    border-radius: 10px;
+    padding: 4px 8px 4px 8px;
+    margin: 0 10px 0 0;
+    cursor: pointer;
   }
-  #btns{
-    margin-left: 20px;
-    user-select: none;
+  #row2{
+    position: relative;
+    top: 10px;
+    right: -520px;
+    display: flex;
+    width: 0%;
+    flex-direction: row;
   }
-  #btns>img{
-    margin-left: 15px;
+  #box{
+    background-color: var(--white);
+    border-radius: 15px;
   }
-  img{
-      height: 25px;
-      filter: invert(88%) sepia(8%) saturate(1480%) hue-rotate(178deg) brightness(106%) contrast(104%);
-      padding-top: 5px;
+  #heading{
+    color: var(--dark);
+    font-size: 20px;
+    font-weight: 500;
+    padding: 5px 47% 0 20px;  
+    white-space: nowrap
   }
-  tr{
-      background-color: var(--gray);
-      border-radius: 50px;
+  hr{
+    border: none;
+    border-top: 2px solid var(--dark);
+    margin-bottom: 15px;
   }
-  td{
-      text-align: left;
-      color: var(--white);
-      font-size: 20px;
-      height: 44px;
+  input{
+    font-size: 20px;
+    margin: 0 20px 20px 20px;
+    border-radius: 10px;
+    padding: 2px 10px 2px 10px;
+    min-width: 600px;
   }
-  tr>td:first-child , tr>td:nth-child(4){
-      text-align: center;
+  .text{
+    color: var(--dark);
+    font-size: 20px;
+    padding: 5px 78% 0 10px;  
+    margin: 0 0 0 15px;
   }
-  tr>td:last-child{
-      border-left-width: 2px;
-      border-right-width:0;
-      border-top-width:0;
-      border-bottom-width:0;
-      border-width: 2px,0px,0px,0px; 
-      border-color: var(--green-light);
-      border-style: solid;
+  section {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color:var(--dark-op);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  td:first-child {
-      border-top-left-radius: 15px; 
-      border-bottom-left-radius: 15px;
-  }
-  td:last-child {
-      border-bottom-right-radius: 15px; 
-      border-top-right-radius: 15px; 
-  }
+  
   </style>

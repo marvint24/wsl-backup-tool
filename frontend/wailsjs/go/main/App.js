@@ -22,6 +22,14 @@ export function LaunchDistro(arg1) {
   return window['go']['main']['App']['LaunchDistro'](arg1);
 }
 
+export function RenameBackupFile(arg1, arg2) {
+  return window['go']['main']['App']['RenameBackupFile'](arg1, arg2);
+}
+
+export function SelectFolder() {
+  return window['go']['main']['App']['SelectFolder']();
+}
+
 export function SetBackupPath(arg1) {
   return window['go']['main']['App']['SetBackupPath'](arg1);
 }

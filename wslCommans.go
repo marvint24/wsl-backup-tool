@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -68,15 +69,53 @@ func (a *App) GetWslList() string {
 }
 
 func (a *App) CreateBackupFile(name string, filename string) {
-	backupPath := currentSettings.BackupPath + name + filename
-	err, _ := exec.Command("wsl", "--export", name, ("\"" + backupPath + "\"")).Output()
+
+	backupPath := currentSettings.BackupPath + "\\" + name
+	backupFile := backupPath + "\\" + filename
+
+	if _, err := os.ReadDir(backupPath); err != nil {
+		runtime.LogWarning(a.ctx, err.Error())
+		if err := os.MkdirAll(backupPath, os.ModePerm); err != nil {
+			runtime.LogError(a.ctx, err.Error())
+		}
+	}
+
+	out, err := exec.Command("wsl", "--export", name, backupFile).Output()
+	if out != nil {
+		runtime.LogInfo(a.ctx, string(out))
+	}
 	if err != nil {
-		runtime.LogError(a.ctx, string(err))
+		runtime.LogError(a.ctx, err.Error())
 	}
 }
 
+type myfile struct {
+	Name    string
+	ModDate string
+}
+
 func (a *App) GetBackupFiles(name string) string {
-	return ""
+	out, _ := os.ReadDir("C:\\Users\\Marvin\\Downloads\\go test")
+	backupFiles := make([]myfile, 0)
+	for _, item := range out {
+		name := item.Name()
+		info, _ := item.Info()
+		modDate := info.ModTime().Format("02.01.2006 15:04")
+		file := myfile{name, modDate}
+		backupFiles = append(backupFiles, file)
+	}
+	jsonStr, _ := json.Marshal(backupFiles)
+	return string(jsonStr)
+}
+
+func (a *App) RenameBackupFile(name string, newName string) {
+	backupPath := currentSettings.BackupPath + "\\" + name
+	backupFile := backupPath + "\\" + name
+	newBackupFile := backupPath + "\\" + newName
+	err := os.Rename(backupFile, newBackupFile)
+	if err != nil {
+		runtime.LogError(a.ctx, err.Error())
+	}
 }
 
 func (a *App) LaunchDistro(name string) {

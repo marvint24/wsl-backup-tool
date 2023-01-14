@@ -1,6 +1,7 @@
 <script lang="ts">
   import folder from "./assets/folder.svg";
-  import {GetSettings} from '../wailsjs/go/main/App.js'
+  import {GetSettings,SetBackupPath,SelectFolder} from '../wailsjs/go/main/App.js'
+  import {selectedWindow} from './store'
 
   let backupPath: string 
   GetSettings().then((result)=>{
@@ -8,16 +9,18 @@
   })
 
   function openFolder(){
+    SelectFolder().then((result)=>{backupPath=result})
+  }
 
+  function close(){
+    $selectedWindow=null
   }
 
   function okay(){
-
+    SetBackupPath(backupPath)
+    close()
   }
 
-  function cancel(){
-    
-  }
 
 </script>
 
@@ -27,11 +30,11 @@
       <div id="heading">Settings</div>
       <hr/>
       <div class="text">Backup folder</div>
-      <div id="row"><input type="text" bind:value={backupPath}><div id="btn" title="Open folder" on:click="{openFolder}" on:keydown><img src="{folder}" alt="folder"></div>
+      <div id="row"><input type="text" bind:value={backupPath}><div id="btn" title="Open folder" on:click="{openFolder}" on:keydown><img src="{folder}" alt="folder"></div></div>
     </div>
     <div id="row2">
       <div id="mbtn" on:click="{okay}" on:keydown>OK</div>
-      <div id="mbtn" on:click="{cancel}" on:keydown>Cancel</div>
+      <div id="mbtn" on:click="{close}" on:keydown>Cancel</div>
     </div>
   </div>
 </section>
@@ -47,8 +50,8 @@
 }
 #row2{
   position: relative;
-  top: 40px;
-  right: -550px;
+  top: 10px;
+  right: -560px;
   display: flex;
   width: 0%;
   flex-direction: row;
@@ -90,7 +93,7 @@ img{
 }
 input{
   font-size: 20px;
-  margin: 0 0 0px 20px;
+  margin: 0 0 20px 20px;
   border-radius: 10px;
   padding: 2px 10px 2px 10px;
   min-width: 600px;

@@ -50,3 +50,11 @@ func (a *App) SetBackupPath(path string) {
 func (a *App) GetSettings() string {
 	return currentSettings.toString()
 }
+
+func (a *App) SelectFolder() string {
+	out, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{})
+	if err != nil {
+		runtime.LogError(a.ctx, err.Error())
+	}
+	return out
+}

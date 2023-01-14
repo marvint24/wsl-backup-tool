@@ -6,7 +6,7 @@ import list from './assets/list.svg'
 import stop from './assets/stop.svg'
 import {refresh,selectedWindow,selectedDistro} from './store'
 import {TerminateWsl,LaunchDistro} from '../wailsjs/go/main/App.js'
-export var distroRow
+export var backupListRow
 
 function refreshDistos(){
     let i=1

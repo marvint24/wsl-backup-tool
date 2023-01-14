@@ -17,9 +17,10 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:  "wsl-backup-tool",
-		Width:  1024,
-		Height: 768,
+		Title:    "wsl-backup-tool",
+		Width:    1024,
+		Height:   768,
+		MinWidth: 768,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
