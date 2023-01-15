@@ -20,7 +20,20 @@
   function getWslDistros(): void {
     GetWslList().then((result)=> {
       let jsonObj=JSON.parse(result)
-      $distros=jsonObj.map((obj)=>{
+
+      let test=[]
+      for (let element of jsonObj){
+        test.push(element)
+        test.push(element)
+        test.push(element)
+        test.push(element)
+      }
+      console.log(test)
+
+      let test2=JSON.stringify(test)
+      let test3=JSON.parse(test2)
+
+      $distros=test3.map((obj)=>{
         obj.uuid=crypto.randomUUID()
         return obj
       })      
@@ -58,7 +71,6 @@
     <div class="Refresh" title="Refresh" on:click="{refreshWslList}" on:keydown><img class="{spinClass}" src="{refreshsvg}" alt="refresh"></div>
   </section>
   <WslList/>
-  <Testa/>
 </main>
 
 <style>
