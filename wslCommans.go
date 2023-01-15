@@ -68,8 +68,7 @@ func (a *App) GetWslList() string {
 	return string(jsonWsl)
 }
 
-func (a *App) CreateBackupFile(name string, filename string) {
-
+func (a *App) CreateBackupFile(name string, filename string, breaker int) {
 	backupPath := currentSettings.BackupPath + "\\" + name
 	backupFile := backupPath + "\\" + filename
 
@@ -80,12 +79,22 @@ func (a *App) CreateBackupFile(name string, filename string) {
 		}
 	}
 
-	out, err := exec.Command("wsl", "--export", name, backupFile).Output()
+	out, err := exec.Command("wsl", "--export", "--vhd", name, backupFile).Output()
 	if out != nil {
 		runtime.LogInfo(a.ctx, string(out))
 	}
 	if err != nil {
 		runtime.LogError(a.ctx, err.Error())
+		if breaker >= 1 {
+			return
+		} else {
+			if _, err := exec.Command("wsl", "--shutdown").Output(); err != nil {
+				runtime.LogError(a.ctx, "Cannot create backup file, error:\n"+err.Error())
+			}
+
+			breaker++
+			a.CreateBackupFile(name, filename, breaker)
+		}
 	}
 }
 
@@ -112,11 +121,27 @@ func (a *App) GetBackupFiles(name string) string {
 	return string(jsonStr)
 }
 
-func (a *App) RenameBackupFile(name string, newName string) {
-	backupPath := currentSettings.BackupPath + "\\" + name
+func (a *App) RenameBackupFile(name string, newName string, distroName string) {
+	backupPath := currentSettings.BackupPath + "\\" + distroName
 	backupFile := backupPath + "\\" + name
 	newBackupFile := backupPath + "\\" + newName
+	runtime.LogInfo(a.ctx, backupFile+"\n\n"+newBackupFile)
+
+	if _, err := os.ReadFile(newBackupFile); err == nil {
+		runtime.LogError(a.ctx, "'"+newBackupFile+"'"+" already exists")
+		return
+	}
+
 	err := os.Rename(backupFile, newBackupFile)
+	if err != nil {
+		runtime.LogError(a.ctx, err.Error())
+	}
+
+}
+
+func (a *App) OpenBackupFolder(distroName string) {
+	backupPath := currentSettings.BackupPath + "\\" + distroName
+	_, err := exec.Command("explorer", backupPath).Output()
 	if err != nil {
 		runtime.LogError(a.ctx, err.Error())
 	}

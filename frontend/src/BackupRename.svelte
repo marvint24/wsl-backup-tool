@@ -2,14 +2,28 @@
   import {RenameBackupFile} from '../wailsjs/go/main/App.js'
   import {selectedDistro,backupRenameWindow} from './store'
 
+  var oldName=$backupRenameWindow.name
   var backupFilename=$backupRenameWindow.name
 
   function close(){
     $backupRenameWindow.name=null
   }
 
+  function removeIllegalCharacters(){
+    backupFilename=backupFilename.replaceAll("<","")
+    backupFilename=backupFilename.replaceAll(">","")
+    backupFilename=backupFilename.replaceAll(":","_")
+    backupFilename=backupFilename.replaceAll("\"","")
+    backupFilename=backupFilename.replaceAll("/","")
+    backupFilename=backupFilename.replaceAll("\\","")
+    backupFilename=backupFilename.replaceAll("|","")
+    backupFilename=backupFilename.replaceAll("?","")
+    backupFilename=backupFilename.replaceAll("*","")
+  }
+
   function renameBackupFile(){
-    // RenameBackupFile()
+    removeIllegalCharacters()
+    RenameBackupFile(oldName,backupFilename,$selectedDistro).then(close)
   }
 </script>
   

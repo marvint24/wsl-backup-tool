@@ -5,7 +5,7 @@
   function refreshDistos(){
     let i=1
     let interval=setInterval(()=>{
-        if(i==20){
+        if(i==5){
             clearInterval(interval)
         }
         $refresh=true
@@ -18,25 +18,31 @@
     backupPath=JSON.parse(result).replaceBackupPath
   })
 
+  
   var backupFilename: string
   let now=new Date().toLocaleString()
-  .replaceAll("<","")
-  .replaceAll(">","")
-  .replaceAll(":","_")
-  .replaceAll("\"","")
-  .replaceAll("/","")
-  .replaceAll("\\","")
-  .replaceAll("|","")
-  .replaceAll("?","")
-  .replaceAll("*","")
   backupFilename=`${now}.vhdx`
+  removeIllegalCharacters()
 
   function close(){
     $selectedWindow=null
   }
 
+  function removeIllegalCharacters(){
+    backupFilename=backupFilename.replaceAll("<","")
+    backupFilename=backupFilename.replaceAll(">","")
+    backupFilename=backupFilename.replaceAll(":","_")
+    backupFilename=backupFilename.replaceAll("\"","")
+    backupFilename=backupFilename.replaceAll("/","")
+    backupFilename=backupFilename.replaceAll("\\","")
+    backupFilename=backupFilename.replaceAll("|","")
+    backupFilename=backupFilename.replaceAll("?","")
+    backupFilename=backupFilename.replaceAll("*","")
+  }
+
   function createBackupFile(){
-    CreateBackupFile($selectedDistro,backupFilename).then()
+    removeIllegalCharacters()
+    CreateBackupFile($selectedDistro,backupFilename,0).then()
     refreshDistos()
     close()
   }

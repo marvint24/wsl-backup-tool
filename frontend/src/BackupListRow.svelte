@@ -26,7 +26,6 @@ function backupRename(){
     $backupRenameWindow={"name":backupFile.Name}
 }
 
-
 function restoreBackup(){
 
 }

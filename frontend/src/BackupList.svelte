@@ -1,8 +1,9 @@
 <script lang="ts">
-  import {GetBackupFiles} from '../wailsjs/go/main/App.js'
+  import {GetBackupFiles,OpenBackupFolder} from '../wailsjs/go/main/App.js'
   import {selectedWindow,selectedDistro,backupRenameWindow} from './store'
   import BackupListRow from './BackupListRow.svelte'
   import BackupRename from './BackupRename.svelte'
+  import folder from "./assets/folder.svg";
 
   function close(){
     $selectedWindow=null
@@ -25,11 +26,15 @@
       }) 
     })
   }
- 
-  listBackupFiles()
 
   $:{
-    console.log(backupFiles)
+    if($backupRenameWindow.name==null){
+      listBackupFiles()
+    }
+  }
+
+  function openFolder(){
+    OpenBackupFolder($selectedDistro)
   }
 
 </script>
@@ -50,7 +55,7 @@
               <tr>
                   <td>Name</td>
                   <td>Created</td>
-                  <td></td>
+                  <td><div class="btn" title="Open folder" on:click="{openFolder}" on:keydown><img src="{folder}" alt="folder"></div></td>
               </tr>
                 {#each backupFiles as item (item.uuid)}
                     <BackupListRow backupFile={item}/>
@@ -70,6 +75,20 @@
 
 
 <style>
+img{
+  padding: 3px 0 0 0;
+  height: 22px;
+}
+.btn{
+  border-width: 1px;
+  border: solid;
+  border-color: var(--dark);
+  background-color: white;
+  border-radius: 8px;
+  width: 34px;
+  height: 28px;
+  cursor: pointer;
+}
 p{
   color: var(--dark);
   font-size: 20px;
@@ -87,6 +106,11 @@ td{
     color: var(--dark);
     font-size: 20px;
     padding-left: 25px;
+}
+td:nth-child(3){
+  display: flex;
+  justify-content: right;
+  text-align: center;
 }
 .mbtn{
   font-size: 20px;
