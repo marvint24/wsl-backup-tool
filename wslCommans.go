@@ -90,8 +90,9 @@ func (a *App) CreateBackupFile(name string, filename string) {
 }
 
 type myfile struct {
-	Name    string
-	ModDate string
+	Name       string
+	ModDate    string
+	ModDateInt int64
 }
 
 func (a *App) GetBackupFiles(name string) string {
@@ -101,8 +102,10 @@ func (a *App) GetBackupFiles(name string) string {
 	for _, item := range out {
 		name := item.Name()
 		info, _ := item.Info()
-		modDate := info.ModTime().Format("02.01.2006 15:04")
-		file := myfile{name, modDate}
+		modDate := info.ModTime()
+		fmodDate := modDate.Format("02.01.2006 15:04")
+
+		file := myfile{name, fmodDate, modDate.Unix()}
 		backupFiles = append(backupFiles, file)
 	}
 	jsonStr, _ := json.Marshal(backupFiles)

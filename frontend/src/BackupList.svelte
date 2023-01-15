@@ -16,10 +16,21 @@
         obj.uuid=crypto.randomUUID()
         return obj
       }) 
+      backupFiles=backupFiles.sort((a,b)=>{
+        if(a.ModDateInt>b.ModDateInt){
+          return -1
+        }else{
+          return 1
+        }
+      }) 
     })
   }
  
   listBackupFiles()
+
+  $:{
+    console.log(backupFiles)
+  }
 
 </script>
   
