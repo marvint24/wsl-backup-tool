@@ -88,7 +88,8 @@ td{
 .row2{
   position: relative;
   top: 10px;
-  left: 91%;
+  margin-left: auto; 
+  margin-right: 80px;
   display: flex;
   width: 0%;
   flex-direction: row;
@@ -103,7 +104,8 @@ td{
   color: var(--dark);
   font-size: 20px;
   font-weight: 500;
-  padding: 5px 47% 0 20px; 
+  padding: 5px 0 0 25px; 
+  text-align: left;
   white-space: nowrap 
 }
 hr{
