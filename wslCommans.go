@@ -95,7 +95,8 @@ type myfile struct {
 }
 
 func (a *App) GetBackupFiles(name string) string {
-	out, _ := os.ReadDir("C:\\Users\\Marvin\\Downloads\\go test")
+	backupPath := currentSettings.BackupPath + "\\" + name
+	out, _ := os.ReadDir(backupPath)
 	backupFiles := make([]myfile, 0)
 	for _, item := range out {
 		name := item.Name()
@@ -113,6 +114,17 @@ func (a *App) RenameBackupFile(name string, newName string) {
 	backupFile := backupPath + "\\" + name
 	newBackupFile := backupPath + "\\" + newName
 	err := os.Rename(backupFile, newBackupFile)
+	if err != nil {
+		runtime.LogError(a.ctx, err.Error())
+	}
+}
+
+func (a *App) RestoreDistro(filename string, disroName string) {
+
+}
+
+func (a *App) ShutdownWsl() {
+	_, err := exec.Command("wsl", "--shutdown").Output()
 	if err != nil {
 		runtime.LogError(a.ctx, err.Error())
 	}

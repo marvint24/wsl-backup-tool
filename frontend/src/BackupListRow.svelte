@@ -1,67 +1,55 @@
 <script lang="ts">
-import check from './assets/check.svg'
-import terminal from './assets/terminal.svg'
-import backup from './assets/backup.svg'
-import list from './assets/list.svg'
-import stop from './assets/stop.svg'
-import {refresh,selectedWindow,selectedDistro} from './store'
-import {TerminateWsl,LaunchDistro} from '../wailsjs/go/main/App.js'
-export var backupListRow
+import {refresh,selectedDistro,backupRenameWindow} from './store'
+import {RenameBackupFile,RestoreDistro} from '../wailsjs/go/main/App.js'
+import cursor from './assets/cursor.svg'
+import restore from './assets/restore.svg'
+import BackupRename from './BackupRename.svelte'
 
-function refreshDistos(){
-    let i=1
-    let interval=setInterval(()=>{
-        if(i==3){
-            clearInterval(interval)
-        }
-        $refresh=true
-        i++
-    },1500)
+export var backupFile
+
+// function refreshDistos(){
+//     let i=1
+//     let interval=setInterval(()=>{
+//         if(i==20){
+//             clearInterval(interval)
+//         }
+//         $refresh=true
+//         i++
+//     },1500)
+// }
+ 
+
+
+
+
+function backupRename(){
+    
 }
 
-function launchDistro(){
-    LaunchDistro(distroRow.Name)
-    refreshDistos()
+
+function restoreBackup(){
+
 }
 
-function createBackup(){
-    $selectedDistro=distroRow.Name
-    $selectedWindow="BackupCreate"
-}
-
-function manageBackups(){
-    $selectedDistro=distroRow.Name
-    $selectedWindow="BackupList"
-}
-
-function terminate(){
-  TerminateWsl(distroRow.Name).then(refreshDistos)
-}
     
 </script>
 
 
-
-<tr>
-    {#if distroRow.Default_}
-        <td><img src="{check}" alt="check"></td>
-    {:else}
-        <td></td>
-    {/if}
-    <td>{distroRow.Name}</td>
-    <td>{distroRow.Status}</td>
-    <td>{distroRow.Wsl_version}</td>
+<section>
+  {#if $backupRenameWindow}
+    <BackupRename/>
+  {/if}
+  <tr>
+    <td>{backupFile.Name}</td>
+    <td>{backupFile.ModDate}</td>
     <td>
-        <div id="btns">
-            <img title="Open in terminal" on:click={launchDistro} on:keydown src="{terminal}" alt="terminal">
-            <img title="Backup" on:click={createBackup} on:keydown src="{backup}" alt="backup">
-            <img title="Manage backups" on:click={manageBackups} on:keydown src="{list}" alt="list">
-            {#if distroRow.Status==="Running"}
-                <img title="Terminate" on:click={terminate} on:keydown src="{stop}" alt="stop">
-            {/if}
-        </div>
+      <div id="btns">
+          <img title="Rename backup" on:click={backupRename} on:keydown src="{cursor}" alt="terminal">
+          <img title="Restore backup" on:click={restoreBackup} on:keydown src="{restore}" alt="backup">
+      </div>
     </td>
-</tr>
+  </tr>
+</section>
 
 
 <style>
@@ -69,7 +57,6 @@ td>div>img{
     cursor: pointer;
 }
 #btns{
-  margin-left: 20px;
   user-select: none;
 }
 #btns>img{
@@ -81,7 +68,7 @@ img{
     padding-top: 5px;
 }
 tr{
-    background-color: var(--gray);
+    background-color: var(--dark);
     border-radius: 50px;
 }
 td{
@@ -89,9 +76,7 @@ td{
     color: var(--white);
     font-size: 20px;
     height: 44px;
-}
-tr>td:first-child , tr>td:nth-child(4){
-    text-align: center;
+    padding-left: 25px;
 }
 tr>td:last-child{
     border-left-width: 2px;

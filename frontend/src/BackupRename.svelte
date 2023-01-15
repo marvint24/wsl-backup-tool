@@ -2,16 +2,6 @@
   import {CreateBackupFile,GetSettings} from '../wailsjs/go/main/App.js'
   import {selectedWindow,selectedDistro,refresh} from './store'
 
-  function refreshDistos(){
-    let i=1
-    let interval=setInterval(()=>{
-        if(i==20){
-            clearInterval(interval)
-        }
-        $refresh=true
-        i++
-    },1500)
-}
  
   let backupPath: string 
   GetSettings().then((result)=>{
@@ -37,7 +27,6 @@
 
   function createBackupFile(){
     CreateBackupFile($selectedDistro,backupFilename).then()
-    refreshDistos()
     close()
   }
 </script>

@@ -26,6 +26,10 @@ export function RenameBackupFile(arg1, arg2) {
   return window['go']['main']['App']['RenameBackupFile'](arg1, arg2);
 }
 
+export function RestoreDistro(arg1, arg2) {
+  return window['go']['main']['App']['RestoreDistro'](arg1, arg2);
+}
+
 export function SelectFolder() {
   return window['go']['main']['App']['SelectFolder']();
 }

@@ -13,6 +13,8 @@ export function LaunchDistro(arg1:string):Promise<void>;
 
 export function RenameBackupFile(arg1:string,arg2:string):Promise<void>;
 
+export function RestoreDistro(arg1:string,arg2:string):Promise<void>;
+
 export function SelectFolder():Promise<string>;
 
 export function SetBackupPath(arg1:string):Promise<void>;

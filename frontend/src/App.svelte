@@ -5,6 +5,8 @@
   import refreshsvg from './assets/refresh.svg'
   import sliders from './assets/sliders.svg'
 
+  import Testa from './Testa.svelte'
+
   import BackupCreate from './BackupCreate.svelte'
   import BackupList from './BackupList.svelte'
   import Settings from './Settings.svelte'
@@ -56,6 +58,7 @@
     <div id="Refresh" title="Refresh" on:click="{refreshWslList}" on:keydown><img class="{spinClass}" src="{refreshsvg}" alt="refresh"></div>
   </section>
   <WslList/>
+  <Testa/>
 </main>
 
 <style>
