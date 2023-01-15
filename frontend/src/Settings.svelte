@@ -9,7 +9,11 @@
   })
 
   function openFolder(){
-    SelectFolder().then((result)=>{backupPath=result})
+    SelectFolder().then((result)=>{
+      if(result){
+        backupPath=result
+      }  
+    })
   }
 
   function close(){
@@ -26,21 +30,21 @@
 
 <section>
   <div>
-    <div id="box">
-      <div id="heading">Settings</div>
+    <div class="box">
+      <div class="heading">Settings</div>
       <hr/>
       <div class="text">Backup folder</div>
-      <div id="row"><input type="text" bind:value={backupPath}><div id="btn" title="Open folder" on:click="{openFolder}" on:keydown><img src="{folder}" alt="folder"></div></div>
+      <div class="row"><input type="text" bind:value={backupPath}><div class="btn" title="Open folder" on:click="{openFolder}" on:keydown><img src="{folder}" alt="folder"></div></div>
     </div>
-    <div id="row2">
-      <div id="mbtn" on:click="{okay}" on:keydown>OK</div>
-      <div id="mbtn" on:click="{close}" on:keydown>Cancel</div>
+    <div class="row2">
+      <div class="mbtn" on:click="{okay}" on:keydown>OK</div>
+      <div class="mbtn" on:click="{close}" on:keydown>Cancel</div>
     </div>
   </div>
 </section>
 
 <style>
-#mbtn{
+.mbtn{
   font-size: 20px;
   background-color: var(--green);
   border-radius: 10px;
@@ -48,7 +52,7 @@
   margin: 0 10px 0 0;
   cursor: pointer;
 }
-#row2{
+.row2{
   position: relative;
   top: 10px;
   right: -560px;
@@ -56,17 +60,18 @@
   width: 0%;
   flex-direction: row;
 }
-#box{
+.box{
   background-color: var(--white);
   border-radius: 15px;
 }
-#heading{
+.heading{
   color: var(--dark);
   font-size: 20px;
   font-weight: 500;
-  padding: 5px 84% 0 20px;  
+  padding: 5px 0 0 20px; 
+  text-align: left; 
 }
-#row{
+.row{
   display: flex;
   flex-direction: row;
 }
@@ -79,7 +84,8 @@ img{
   padding: 3px 0 0 0;
   height: 22px;
 }
-#btn{
+.btn{
+  text-align: center;
   border-width: 1px;
   border: solid;
   border-color: var(--dark);
@@ -101,8 +107,8 @@ input{
 .text{
   color: var(--dark);
   font-size: 20px;
-  padding: 5px 78% 0 10px;  
-  margin: 0 0 0 15px;
+  padding: 5px 0 0 25px;  
+  text-align: left;
 }
 section {
   position: absolute;

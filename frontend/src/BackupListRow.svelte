@@ -3,7 +3,7 @@ import {refresh,selectedDistro,backupRenameWindow} from './store'
 import {RenameBackupFile,RestoreDistro} from '../wailsjs/go/main/App.js'
 import cursor from './assets/cursor.svg'
 import restore from './assets/restore.svg'
-import BackupRename from './BackupRename.svelte'
+
 
 export var backupFile
 
@@ -23,7 +23,7 @@ export var backupFile
 
 
 function backupRename(){
-    
+    $backupRenameWindow={"name":backupFile.Name}
 }
 
 
@@ -35,31 +35,28 @@ function restoreBackup(){
 </script>
 
 
-<section>
-  {#if $backupRenameWindow}
-    <BackupRename/>
-  {/if}
-  <tr>
-    <td>{backupFile.Name}</td>
-    <td>{backupFile.ModDate}</td>
-    <td>
-      <div id="btns">
-          <img title="Rename backup" on:click={backupRename} on:keydown src="{cursor}" alt="terminal">
-          <img title="Restore backup" on:click={restoreBackup} on:keydown src="{restore}" alt="backup">
-      </div>
-    </td>
-  </tr>
-</section>
+
+<tr>
+  <td>{backupFile.Name}</td>
+  <td>{backupFile.ModDate}</td>
+  <td>
+    <div class="btns">
+        <img title="Rename backup" on:click={backupRename} on:keydown src="{cursor}" alt="terminal">
+        <img title="Restore backup" on:click={restoreBackup} on:keydown src="{restore}" alt="backup">
+    </div>
+  </td>
+</tr>
+
 
 
 <style>
 td>div>img{
     cursor: pointer;
 }
-#btns{
+.btns{
   user-select: none;
 }
-#btns>img{
+.btns>img{
   margin-left: 15px;
 }
 img{

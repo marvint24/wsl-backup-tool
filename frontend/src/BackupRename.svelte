@@ -1,33 +1,15 @@
 <script lang="ts">
-  import {CreateBackupFile,GetSettings} from '../wailsjs/go/main/App.js'
-  import {selectedWindow,selectedDistro,refresh} from './store'
+  import {RenameBackupFile} from '../wailsjs/go/main/App.js'
+  import {selectedDistro,backupRenameWindow} from './store'
 
- 
-  let backupPath: string 
-  GetSettings().then((result)=>{
-    backupPath=JSON.parse(result).replaceBackupPath
-  })
-
-  var backupFilename: string
-  let now=new Date().toLocaleString()
-  .replaceAll("<","")
-  .replaceAll(">","")
-  .replaceAll(":","_")
-  .replaceAll("\"","")
-  .replaceAll("/","")
-  .replaceAll("\\","")
-  .replaceAll("|","")
-  .replaceAll("?","")
-  .replaceAll("*","")
-  backupFilename=`${now}.tar`
+  var backupFilename=$backupRenameWindow.name
 
   function close(){
-    $selectedWindow=null
+    $backupRenameWindow.name=null
   }
 
-  function createBackupFile(){
-    CreateBackupFile($selectedDistro,backupFilename).then()
-    close()
+  function renameBackupFile(){
+    // RenameBackupFile()
   }
 </script>
   
@@ -35,22 +17,22 @@
   
 <section>
   <div>
-    <div id="box">
-      <div id="heading">Create backup TAR-file for {$selectedDistro}</div>
+    <div class="box">
+      <div class="heading">Rename backup file for {$selectedDistro}</div>
       <hr/>
-      <div class="text">Select name</div>
+      <div class="text">New name</div>
       <input type="text" bind:value={backupFilename}>
     </div>
-    <div id="row2">
-      <div id="mbtn" on:click="{createBackupFile}" on:keydown>OK</div>
-      <div id="mbtn" on:click="{close}" on:keydown>Cancel</div>
+    <div class="row2">
+      <div class="mbtn" on:click="{renameBackupFile}" on:keydown>OK</div>
+      <div class="mbtn" on:click="{close}" on:keydown>Cancel</div>
     </div>
   </div>
 </section>
 
 
 <style>
-  #mbtn{
+  .mbtn{
     font-size: 20px;
     background-color: var(--green);
     border-radius: 10px;
@@ -58,7 +40,7 @@
     margin: 0 10px 0 0;
     cursor: pointer;
   }
-  #row2{
+  .row2{
     position: relative;
     top: 10px;
     right: -520px;
@@ -66,15 +48,16 @@
     width: 0%;
     flex-direction: row;
   }
-  #box{
+  .box{
     background-color: var(--white);
     border-radius: 15px;
   }
-  #heading{
+  .heading{
     color: var(--dark);
     font-size: 20px;
     font-weight: 500;
-    padding: 5px 47% 0 20px;  
+    padding: 5px 0 0 25px;  
+    text-align: left;
     white-space: nowrap
   }
   hr{
@@ -92,8 +75,8 @@
   .text{
     color: var(--dark);
     font-size: 20px;
-    padding: 5px 78% 0 10px;  
-    margin: 0 0 0 15px;
+    padding: 5px 0 0 25px; 
+    text-align: left; 
   }
   section {
     position: absolute;

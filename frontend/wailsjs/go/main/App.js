@@ -38,6 +38,10 @@ export function SetBackupPath(arg1) {
   return window['go']['main']['App']['SetBackupPath'](arg1);
 }
 
+export function ShutdownWsl() {
+  return window['go']['main']['App']['ShutdownWsl']();
+}
+
 export function TerminateWsl(arg1) {
   return window['go']['main']['App']['TerminateWsl'](arg1);
 }

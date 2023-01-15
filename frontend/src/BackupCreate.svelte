@@ -29,7 +29,7 @@
   .replaceAll("|","")
   .replaceAll("?","")
   .replaceAll("*","")
-  backupFilename=`${now}.tar`
+  backupFilename=`${now}.vhdx`
 
   function close(){
     $selectedWindow=null
@@ -46,22 +46,22 @@
   
 <section>
   <div>
-    <div id="box">
-      <div id="heading">Create backup TAR-file for {$selectedDistro}</div>
+    <div class="box">
+      <div class="heading">Create backup file for {$selectedDistro}</div>
       <hr/>
       <div class="text">Select name</div>
       <input type="text" bind:value={backupFilename}>
     </div>
-    <div id="row2">
-      <div id="mbtn" on:click="{createBackupFile}" on:keydown>OK</div>
-      <div id="mbtn" on:click="{close}" on:keydown>Cancel</div>
+    <div class="row2">
+      <div class="mbtn" on:click="{createBackupFile}" on:keydown>OK</div>
+      <div class="mbtn" on:click="{close}" on:keydown>Cancel</div>
     </div>
   </div>
 </section>
 
 
 <style>
-  #mbtn{
+  .mbtn{
     font-size: 20px;
     background-color: var(--green);
     border-radius: 10px;
@@ -69,7 +69,7 @@
     margin: 0 10px 0 0;
     cursor: pointer;
   }
-  #row2{
+  .row2{
     position: relative;
     top: 10px;
     right: -520px;
@@ -77,16 +77,23 @@
     width: 0%;
     flex-direction: row;
   }
-  #box{
+  .box{
     background-color: var(--white);
     border-radius: 15px;
   }
-  #heading{
+  .heading{
     color: var(--dark);
     font-size: 20px;
     font-weight: 500;
-    padding: 5px 47% 0 20px;  
-    white-space: nowrap
+    padding: 5px 0 0 25px;  
+    white-space: nowrap;
+    text-align: left;
+  }
+  .text{
+    color: var(--dark);
+    font-size: 20px;
+    padding: 5px 0 0 25px; 
+    text-align: left; 
   }
   hr{
     border: none;
@@ -99,12 +106,6 @@
     border-radius: 10px;
     padding: 2px 10px 2px 10px;
     min-width: 600px;
-  }
-  .text{
-    color: var(--dark);
-    font-size: 20px;
-    padding: 5px 78% 0 10px;  
-    margin: 0 0 0 15px;
   }
   section {
     position: absolute;

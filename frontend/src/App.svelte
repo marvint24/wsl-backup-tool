@@ -53,16 +53,16 @@
   {#if selectedWindow}
     <svelte:component this={imported[$selectedWindow]} />
   {/if}
-  <section id="header">
-    <div id="Settings" title="Settings" on:click="{openSettings}" on:keydown><img src="{sliders}" alt="sliders"><p>Settings</p>  </div>
-    <div id="Refresh" title="Refresh" on:click="{refreshWslList}" on:keydown><img class="{spinClass}" src="{refreshsvg}" alt="refresh"></div>
+  <section class="header">
+    <div class="Settings" title="Settings" on:click="{openSettings}" on:keydown><img src="{sliders}" alt="sliders"><p>Settings</p>  </div>
+    <div class="Refresh" title="Refresh" on:click="{refreshWslList}" on:keydown><img class="{spinClass}" src="{refreshsvg}" alt="refresh"></div>
   </section>
   <WslList/>
   <Testa/>
 </main>
 
 <style>
-#header{
+.header{
   margin-bottom: 50px;
   display: flex;
   justify-content: space-between;
@@ -71,19 +71,19 @@ img{
     height: 25px;
     filter: invert(88%) sepia(8%) saturate(1480%) hue-rotate(178deg) brightness(106%) contrast(104%);
 }
-#Settings{
+.Settings{
   border-radius: 0 0 15px 0;
 }
-#Settings>p{
+.Settings>p{
   color: var(--white);
   font-size: 20px;
   margin: 10px 0 10px 5px;
   font-weight: 500;
 }
-#Refresh{
+.Refresh{
   border-radius: 0 0 0 15px;
 }
-#header>div{
+.header>div{
   display: flex;
   flex-direction: row;
   align-items: center;;
@@ -91,7 +91,7 @@ img{
   padding-right: 15px;
   background-color: var(--green-light);
 }
-#header>div:hover{
+.header>div:hover{
   cursor: pointer;
 }
 

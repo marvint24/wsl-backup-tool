@@ -1,7 +1,8 @@
 <script lang="ts">
   import {GetBackupFiles} from '../wailsjs/go/main/App.js'
-  import {selectedWindow,selectedDistro} from './store'
+  import {selectedWindow,selectedDistro,backupRenameWindow} from './store'
   import BackupListRow from './BackupListRow.svelte'
+  import BackupRename from './BackupRename.svelte'
 
   function close(){
     $selectedWindow=null
@@ -19,37 +20,51 @@
   }
  
   listBackupFiles()
+
 </script>
   
   
   
-<section id="window">
+<section class="window">
+  {#if $backupRenameWindow.name != null}
+    <BackupRename/>
+  {/if}
   <div>
-    <div id="box">
-      <div id="heading">Manage backup TAR-files for {$selectedDistro}</div>
+    <div class="box">
+      <div class="heading">Manage backup files for {$selectedDistro}</div>
       <hr/>
       <section>
-        <table>
-            <tr>
-                <td>Name</td>
-                <td>Created</td>
-                <td></td>
-            </tr>
-            {#each backupFiles as item (item.uuid)}
-                <BackupListRow backupFile={item}/>
-            {/each}
-        </table>
+        {#if backupFiles.length!=0}
+          <table>
+              <tr>
+                  <td>Name</td>
+                  <td>Created</td>
+                  <td></td>
+              </tr>
+                {#each backupFiles as item (item.uuid)}
+                    <BackupListRow backupFile={item}/>
+                {/each}
+          </table>
+        {:else}
+          <p>There are no files {":("}</p>
+        {/if}
       </section>
 
     </div>
-    <div id="row2">
-      <div id="mbtn" on:click="{close}" on:keydown>Close</div>
+    <div class="row2">
+      <div class="mbtn" on:click="{close}" on:keydown>Close</div>
     </div>
   </div>
 </section>
 
 
 <style>
+p{
+  color: var(--dark);
+  font-size: 20px;
+  font-weight: 500;
+  white-space: nowrap 
+}
 table{
   width: 95%;
   margin-left: auto;
@@ -62,7 +77,7 @@ td{
     font-size: 20px;
     padding-left: 25px;
 }
-#mbtn{
+.mbtn{
   font-size: 20px;
   background-color: var(--green);
   border-radius: 10px;
@@ -70,7 +85,7 @@ td{
   margin: 0 10px 0 0;
   cursor: pointer;
 }
-#row2{
+.row2{
   position: relative;
   top: 10px;
   left: 91%;
@@ -78,13 +93,13 @@ td{
   width: 0%;
   flex-direction: row;
 }
-#box{
+.box{
   background-color: var(--white);
   border-radius: 15px;
   width: 95vw;
   height: 89vh;
 }
-#heading{
+.heading{
   color: var(--dark);
   font-size: 20px;
   font-weight: 500;
@@ -96,20 +111,7 @@ hr{
   border-top: 2px solid var(--dark);
   margin-bottom: 15px;
 }
-input{
-  font-size: 20px;
-  margin: 0 20px 20px 20px;
-  border-radius: 10px;
-  padding: 2px 10px 2px 10px;
-  min-width: 600px;
-}
-.text{
-  color: var(--dark);
-  font-size: 20px;
-  padding: 5px 78% 0 10px;  
-  margin: 0 0 0 15px;
-}
-#window {
+.window {
   position: absolute;
   width: 100%;
   height: 100%;

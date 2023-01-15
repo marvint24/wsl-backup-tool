@@ -52,7 +52,7 @@ function terminate(){
     <td>{distroRow.Status}</td>
     <td>{distroRow.Wsl_version}</td>
     <td>
-        <div id="btns">
+        <div class="btns">
             <img title="Open in terminal" on:click={launchDistro} on:keydown src="{terminal}" alt="terminal">
             <img title="Backup" on:click={createBackup} on:keydown src="{backup}" alt="backup">
             <img title="Manage backups" on:click={manageBackups} on:keydown src="{list}" alt="list">
@@ -68,11 +68,11 @@ function terminate(){
 td>div>img{
     cursor: pointer;
 }
-#btns{
+.btns{
   margin-left: 20px;
   user-select: none;
 }
-#btns>img{
+.btns>img{
   margin-left: 15px;
 }
 img{

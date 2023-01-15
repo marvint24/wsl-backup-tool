@@ -5,4 +5,4 @@ export const distros = writable([])
 export const refresh = writable(false)
 export const selectedWindow = writable("")
 
-export const backupRenameWindow = writable(false)
+export const backupRenameWindow = writable({"name":null})
