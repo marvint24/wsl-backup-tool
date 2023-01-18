@@ -17,23 +17,10 @@
     Settings
   }
 
-  function getWslDistros(): void {
+   function getWslDistros(): void {
     GetWslList().then((result)=> {
       let jsonObj=JSON.parse(result)
-
-      let test=[]
-      for (let element of jsonObj){
-        test.push(element)
-        test.push(element)
-        test.push(element)
-        test.push(element)
-      }
-      console.log(test)
-
-      let test2=JSON.stringify(test)
-      let test3=JSON.parse(test2)
-
-      $distros=test3.map((obj)=>{
+      $distros=jsonObj.map((obj)=>{
         obj.uuid=crypto.randomUUID()
         return obj
       })      

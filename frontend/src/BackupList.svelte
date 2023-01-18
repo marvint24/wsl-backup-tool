@@ -51,16 +51,18 @@
       <hr/>
       <section>
         {#if backupFiles.length!=0}
+        <div class="scroll">
           <table>
               <tr>
-                  <td>Name</td>
-                  <td>Created</td>
-                  <td><div class="btn" title="Open folder" on:click="{openFolder}" on:keydown><img src="{folder}" alt="folder"></div></td>
+                <td>Name</td>
+                <td>Created</td>
+                <td><div class="btn" title="Open folder" on:click="{openFolder}" on:keydown><img src="{folder}" alt="folder"></div></td>
               </tr>
                 {#each backupFiles as item (item.uuid)}
-                    <BackupListRow backupFile={item}/>
+                  <BackupListRow backupFile={item}/>
                 {/each}
           </table>
+        </div>
         {:else}
           <p>There are no files {":("}</p>
         {/if}
@@ -75,6 +77,24 @@
 
 
 <style>
+section {
+  padding: 0 5px 0 5px;
+}
+.scroll{
+  overflow: auto;
+  max-height: calc(100vh - 152px);
+}
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: hwb(0 0% 100% / 0);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--dark);
+  border-radius: 5px;
+}
+
 img{
   padding: 3px 0 0 0;
   height: 22px;
@@ -150,8 +170,8 @@ hr{
 }
 .window {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
   background-color:var(--dark-op);
   z-index: 1;
   display: flex;
