@@ -11,7 +11,7 @@
         $refresh=true
         i++
     },1500)
-}
+  }
  
   let backupPath: string 
   GetSettings().then((result)=>{

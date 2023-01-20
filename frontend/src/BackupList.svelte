@@ -120,6 +120,7 @@ table{
   margin-left: auto;
   margin-right: auto;
   border-spacing: 0 10px;
+  margin-bottom: 20px;
 }
 td{
     text-align: left;
@@ -153,7 +154,6 @@ td:nth-child(3){
   background-color: var(--white);
   border-radius: 15px;
   width: 95vw;
-  height: 89vh;
 }
 .heading{
   color: var(--dark);
@@ -171,7 +171,7 @@ hr{
 .window {
   position: absolute;
   width: calc(100% - 10px);
-  height: calc(100% - 10px);
+  height: 100%;
   background-color:var(--dark-op);
   z-index: 1;
   display: flex;
