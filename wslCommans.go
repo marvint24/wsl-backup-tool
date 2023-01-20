@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"golang.org/x/sys/windows/registry"
 )
 
 func (a *App) TerminateWsl(name string) {
@@ -147,7 +148,82 @@ func (a *App) OpenBackupFolder(distroName string) {
 	}
 }
 
+func (a *App) getDistroPath(disroName string) string {
+	regPath := `Software\Microsoft\Windows\CurrentVersion\Lxss`
+	lxss, err := registry.OpenKey(registry.CURRENT_USER, regPath, registry.READ)
+	if err != nil {
+		runtime.LogError(a.ctx, err.Error())
+	}
+	defer lxss.Close()
+
+	distros, err := lxss.ReadSubKeyNames(0)
+	if err != nil {
+		runtime.LogError(a.ctx, err.Error())
+	}
+
+	for _, key := range distros {
+		skey, err := registry.OpenKey(registry.CURRENT_USER, regPath+`\`+key, registry.QUERY_VALUE)
+		if err != nil {
+			runtime.LogError(a.ctx, err.Error())
+		}
+		defer skey.Close()
+
+		name, _, err := skey.GetStringValue("DistributionName")
+		if err != nil {
+			runtime.LogError(a.ctx, err.Error())
+		}
+
+		if name == disroName {
+			ext4FileLocation, _, err := skey.GetStringValue("BasePath")
+			if err != nil {
+				runtime.LogError(a.ctx, err.Error())
+			}
+			return ext4FileLocation
+		}
+	}
+	return ""
+}
+
 func (a *App) RestoreDistro(filename string, disroName string) {
+	dPath := a.getDistroPath(disroName)
+	if dPath == "" {
+		return
+	}
+	ext4FileLocation := "'" + dPath + `\` + "ext4.vhdx" + "'"
+	bakFile := "'" + dPath + `\` + "ext4.vhdx.bak" + "'"
+
+	for i := 0; i < 2; i++ {
+		if i == 1 {
+			a.ShutdownWsl()
+			runtime.LogInfo(a.ctx, "Shutting down WSL")
+		}
+		_, err := exec.Command("powershell", "-Command", "Rename-Item", ext4FileLocation, bakFile).Output()
+		if err != nil {
+			runtime.LogError(a.ctx, err.Error())
+			runtime.LogError(a.ctx, "Cannot rename: "+ext4FileLocation)
+			if i == 1 {
+				return
+			}
+		} else {
+			break
+		}
+	}
+
+	restoreFile := "'" + currentSettings.BackupPath + "\\" + disroName + "\\" + filename + "'"
+	_, err := exec.Command("powershell", "-Command", "Copy-Item", restoreFile, ext4FileLocation).Output()
+	if err != nil {
+		runtime.LogError(a.ctx, err.Error())
+		runtime.LogError(a.ctx, "Cannot copy: "+restoreFile+" to "+ext4FileLocation)
+		return
+	}
+
+	_, err2 := exec.Command("powershell", "-Command", "Remove-Item", bakFile).Output()
+	if err2 != nil {
+		runtime.LogError(a.ctx, err.Error())
+		runtime.LogError(a.ctx, "Cannot delete: "+bakFile)
+	}
+
+	runtime.LogInfo(a.ctx, "Restored: "+restoreFile+" to "+ext4FileLocation)
 
 }
 
