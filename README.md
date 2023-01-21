@@ -3,6 +3,7 @@
 ### About
 
 WSL Backup Tool is a tool for easily creating and managing backups of your Windows Subsystem for Linux (WSL) distros.
+Build with [Wails](https://wails.io), [Svelte](https://svelte.dev), [TypeScript](https://www.typescriptlang.org) and [GO](https://go.dev)
 
 Features:
 * Create backups of your entire WSL distro with just a few clicks.
