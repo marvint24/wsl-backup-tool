@@ -126,7 +126,6 @@ func (a *App) RenameBackupFile(name string, newName string, distroName string) {
 	backupPath := currentSettings.BackupPath + "\\" + distroName
 	backupFile := backupPath + "\\" + name
 	newBackupFile := backupPath + "\\" + newName
-	runtime.LogInfo(a.ctx, backupFile+"\n\n"+newBackupFile)
 
 	if _, err := os.ReadFile(newBackupFile); err == nil {
 		runtime.LogError(a.ctx, "'"+newBackupFile+"'"+" already exists")
@@ -136,7 +135,10 @@ func (a *App) RenameBackupFile(name string, newName string, distroName string) {
 	err := os.Rename(backupFile, newBackupFile)
 	if err != nil {
 		runtime.LogError(a.ctx, err.Error())
+		return
 	}
+
+	runtime.LogInfo(a.ctx, "Renamed: "+backupFile+" to "+newBackupFile)
 
 }
 
