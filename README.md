@@ -13,7 +13,7 @@ Features:
 * Launch and stop distros from within the app.
 
 <p float="left">
-  
+  <img src="https://github.com/marvint24/wsl-backup-tool/blob/main/.readme-pictures/home.png" style="width:49%;" />
   <img src="https://github.com/marvint24/wsl-backup-tool/blob/main/.readme-pictures/list.png" style="width:49%;" /> 
 </p>
 
