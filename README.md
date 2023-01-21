@@ -1,5 +1,5 @@
 <h1>WSL Backup Tool</h1>
-<img src="https://github.com/marvint24/wsl-backup-tool/blob/main/build/appicon.png" width="60" />
+<img src="https://github.com/marvint24/wsl-backup-tool/blob/main/build/appicon.png" width="128" />
 
 
 
