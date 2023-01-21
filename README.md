@@ -1,9 +1,7 @@
 # WSL Backup Tool
 
-### About
-
-WSL Backup Tool is a tool for easily creating and managing backups of your Windows Subsystem for Linux (WSL) distros.  
-Build with [Wails](https://wails.io), [Svelte](https://svelte.dev), [TypeScript](https://www.typescriptlang.org) and [GO](https://go.dev)
+WSL Backup Tool is a tool with GUI for easily creating and managing backups of your Windows Subsystem for Linux (WSL) distros.  
+Build with [Wails](https://wails.io), [Svelte](https://svelte.dev), [TypeScript](https://www.typescriptlang.org) and [GO](https://go.dev).
 
 Features:
 * Create backups of your entire WSL distro with just a few clicks.
@@ -11,6 +9,10 @@ Features:
 * Manage your backup files.
 * Launch and stop distros from within the app.
 
+<p float="left">
+  <img src="https://github.com/marvint24/wsl-backup-tool/blob/main/.readme-pictures/home.png" style="width:49%;" />
+  <img src="https://github.com/marvint24/wsl-backup-tool/blob/main/.readme-pictures/list.png" style="width:49%;" /> 
+</p>
 
 ## Usage
 1. Download the app under [Releases](https://github.com/marvint24/wsl-backup-tool/releases)
