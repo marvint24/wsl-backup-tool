@@ -32,7 +32,7 @@ func (settings *settingsType) toString() string {
 	return string(jsonStr)
 }
 
-var settingsFolder = os.Getenv("APPDATA") + "\\wsl-backup-tool.exe\\settings\\"
+var settingsFolder = os.Getenv("APPDATA") + "\\WSL Backup Tool.exe\\settings\\"
 var settingsFileName = settingsFolder + "settings.json"
 var currentSettings settingsType
 
