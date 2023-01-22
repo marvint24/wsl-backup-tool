@@ -6,13 +6,20 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"syscall"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"golang.org/x/sys/windows/registry"
 )
 
+func runCommand(name string, args ...string) *exec.Cmd {
+	cmd := runCommand(name, args...)
+	cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: 0x08000000}
+	return cmd
+}
+
 func (a *App) TerminateWsl(name string) {
-	_, err := exec.Command("wsl", "-t", name).Output()
+	_, err := runCommand("wsl", "-t", name).Output()
 	if err != nil {
 		runtime.LogError(a.ctx, err.Error())
 	}
@@ -26,7 +33,7 @@ func (a *App) GetWslList() string {
 		Wsl_version int
 	}
 
-	out, _ := exec.Command("wsl", "-l", "-v").Output()
+	out, _ := runCommand("wsl", "-l", "-v").Output()
 	// Remove empty chars
 	newArr := make([]byte, 0)
 	for _, letter := range out {
@@ -80,7 +87,7 @@ func (a *App) CreateBackupFile(name string, filename string, breaker int) {
 		}
 	}
 
-	out, err := exec.Command("wsl", "--export", "--vhd", name, backupFile).Output()
+	out, err := runCommand("wsl", "--export", "--vhd", name, backupFile).Output()
 	if out != nil {
 		runtime.LogInfo(a.ctx, string(out))
 	}
@@ -89,7 +96,7 @@ func (a *App) CreateBackupFile(name string, filename string, breaker int) {
 		if breaker >= 1 {
 			return
 		} else {
-			if _, err := exec.Command("wsl", "--shutdown").Output(); err != nil {
+			if _, err := runCommand("wsl", "--shutdown").Output(); err != nil {
 				runtime.LogError(a.ctx, "Cannot create backup file, error:\n"+err.Error())
 			}
 
@@ -144,7 +151,7 @@ func (a *App) RenameBackupFile(name string, newName string, distroName string) {
 
 func (a *App) OpenBackupFolder(distroName string) {
 	backupPath := currentSettings.BackupPath + "\\" + distroName
-	_, err := exec.Command("explorer", backupPath).Output()
+	_, err := runCommand("explorer", backupPath).Output()
 	if err != nil {
 		runtime.LogError(a.ctx, err.Error())
 	}
@@ -199,7 +206,7 @@ func (a *App) RestoreDistro(filename string, disroName string) {
 			a.ShutdownWsl()
 			runtime.LogInfo(a.ctx, "Shutting down WSL")
 		}
-		_, err := exec.Command("powershell", "-Command", "Rename-Item", ext4FileLocation, bakFile).Output()
+		_, err := runCommand("powershell", "-Command", "Rename-Item", ext4FileLocation, bakFile).Output()
 		if err != nil {
 			runtime.LogError(a.ctx, err.Error())
 			runtime.LogError(a.ctx, "Cannot rename: "+ext4FileLocation)
@@ -212,14 +219,14 @@ func (a *App) RestoreDistro(filename string, disroName string) {
 	}
 
 	restoreFile := "'" + currentSettings.BackupPath + "\\" + disroName + "\\" + filename + "'"
-	_, err := exec.Command("powershell", "-Command", "Copy-Item", restoreFile, ext4FileLocation).Output()
+	_, err := runCommand("powershell", "-Command", "Copy-Item", restoreFile, ext4FileLocation).Output()
 	if err != nil {
 		runtime.LogError(a.ctx, err.Error())
 		runtime.LogError(a.ctx, "Cannot copy: "+restoreFile+" to "+ext4FileLocation)
 		return
 	}
 
-	_, err2 := exec.Command("powershell", "-Command", "Remove-Item", bakFile).Output()
+	_, err2 := runCommand("powershell", "-Command", "Remove-Item", bakFile).Output()
 	if err2 != nil {
 		runtime.LogError(a.ctx, err.Error())
 		runtime.LogError(a.ctx, "Cannot delete: "+bakFile)
@@ -230,14 +237,14 @@ func (a *App) RestoreDistro(filename string, disroName string) {
 }
 
 func (a *App) ShutdownWsl() {
-	_, err := exec.Command("wsl", "--shutdown").Output()
+	_, err := runCommand("wsl", "--shutdown").Output()
 	if err != nil {
 		runtime.LogError(a.ctx, err.Error())
 	}
 }
 
 func (a *App) LaunchDistro(name string) {
-	_, err := exec.Command("cmd", "/c", "start", "wsl", "-d", name, "--cd", "~").Output()
+	_, err := runCommand("cmd", "/c", "start", "wsl", "-d", name, "--cd", "~").Output()
 	if err != nil {
 		runtime.LogError(a.ctx, err.Error())
 	}
