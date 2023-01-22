@@ -22,6 +22,8 @@ Features:
 2. Select your backup folder under the "Settings" menu. (Your backup files will be stored in separate folders there)
 3. Start using the app: Launch distros, create backups, restore them, ...
 
+The settings file is located under `%AppData%\WSL Backup Tool.exe\settings\settings.json`.
+
 ## Info
 Please note that WSL Backup Tool is currently in alpha state. If you encounter any bugs, please report them. Also keep in mind to have a second backup.  
 
