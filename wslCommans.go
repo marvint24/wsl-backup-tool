@@ -13,7 +13,7 @@ import (
 )
 
 func runCommand(name string, args ...string) *exec.Cmd {
-	cmd := runCommand(name, args...)
+	cmd := exec.Command(name, args...)
 	cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: 0x08000000}
 	return cmd
 }
