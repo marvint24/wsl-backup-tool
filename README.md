@@ -17,15 +17,18 @@ Features:
   <img src="https://github.com/marvint24/wsl-backup-tool/blob/main/.readme-pictures/list.png" style="width:49%;" /> 
 </p>
 
+## Info
+Please note that WSL Backup Tool is currently in alpha state. If you encounter any bugs, please report them. Also keep in mind to have a second backup.  
+
+## Requirements
+Windows Subsystem for Linux (WSL) version 2
+
 ## Usage
 1. Download the app under [Releases](https://github.com/marvint24/wsl-backup-tool/releases)
 2. Select your backup folder under the "Settings" menu. (Your backup files will be stored in separate folders there)
 3. Start using the app: Launch distros, create backups, restore them, ...
 
 The settings file is located under `%AppData%\WSL Backup Tool.exe\settings\settings.json`.
-
-## Info
-Please note that WSL Backup Tool is currently in alpha state. If you encounter any bugs, please report them. Also keep in mind to have a second backup.  
 
 ## Building
 If you want to build the app on your own, please follow the steps on the [Wails website](https://wails.io/docs/gettingstarted/installation/)  
