@@ -4,6 +4,7 @@
   import {distros,refresh,selectedWindow} from './store'
   import refreshsvg from './assets/refresh.svg'
   import sliders from './assets/sliders.svg'
+  import {Events} from '@wails/runtime'
 
   // import Testa from './Testa.svelte'
 
@@ -46,6 +47,9 @@
       $refresh = false
     }
   }
+
+  //Global event listeners
+
 
 </script>
   

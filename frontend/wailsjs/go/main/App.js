@@ -49,3 +49,7 @@ export function ShutdownWsl() {
 export function TerminateWsl(arg1) {
   return window['go']['main']['App']['TerminateWsl'](arg1);
 }
+
+export function TestPath(arg1) {
+  return window['go']['main']['App']['TestPath'](arg1);
+}

@@ -10,17 +10,21 @@ import (
 func (a *App) init() {
 	settingsFile, err := os.ReadFile(settingsFileName)
 	if err != nil {
-		runtime.LogWarning(a.ctx, err.Error())
+		a.log(1, err.Error())
 		if err := os.MkdirAll(settingsFolder, os.ModePerm); err != nil {
-			runtime.LogError(a.ctx, err.Error())
+			a.log(2, err.Error())
 		} else {
 			if err := os.WriteFile(settingsFileName, []byte{}, os.ModePerm); err != nil {
-				runtime.LogError(a.ctx, err.Error())
+				a.log(2, err.Error())
 			}
 		}
 	}
 
 	json.Unmarshal(settingsFile, &currentSettings)
+	if !a.TestPath(currentSettings.BackupPath) {
+		runtime.EventsEmit(a.ctx, "openSettings", nil)
+	}
+
 }
 
 type settingsType struct {
@@ -38,7 +42,7 @@ var currentSettings settingsType
 
 func saveSettings(settings settingsType, a *App) {
 	if err := os.WriteFile(settingsFileName, []byte(settings.toString()), os.ModePerm); err != nil {
-		runtime.LogError(a.ctx, err.Error())
+		a.log(2, err.Error())
 	}
 }
 
@@ -51,10 +55,15 @@ func (a *App) GetSettings() string {
 	return currentSettings.toString()
 }
 
+func (a *App) TestPath(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
+}
+
 func (a *App) SelectFolder() string {
 	out, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{})
 	if err != nil {
-		runtime.LogError(a.ctx, err.Error())
+		a.log(2, err.Error())
 	}
 	return out
 }

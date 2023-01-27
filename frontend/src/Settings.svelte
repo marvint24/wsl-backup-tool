@@ -1,17 +1,35 @@
 <script lang="ts">
   import folder from "./assets/folder.svg";
-  import {GetSettings,SetBackupPath,SelectFolder} from '../wailsjs/go/main/App.js'
+  import {GetSettings,SetBackupPath,SelectFolder,TestPath} from '../wailsjs/go/main/App.js'
   import {selectedWindow} from './store'
 
+  
   let backupPath: string 
   GetSettings().then((result)=>{
     backupPath=JSON.parse(result).BackupPath
   })
 
+  let backupCSS: string
+  async function checkPath():Promise<boolean>{
+    let returnVal:boolean
+    await TestPath(backupPath).then((res)=>{
+      if(res){
+        backupCSS=null
+        returnVal=true
+      }else{
+        backupCSS="invalid"
+        returnVal=false
+      }
+    })
+
+    return returnVal
+  }
+
   function openFolder(){
     SelectFolder().then((result)=>{
       if(result){
         backupPath=result
+        checkPath()
       }  
     })
   }
@@ -20,9 +38,11 @@
     $selectedWindow=null
   }
 
-  function okay(){
-    SetBackupPath(backupPath)
-    close()
+  async function okay(){
+    if (await checkPath()){
+      SetBackupPath(backupPath)
+      close()
+    }
   }
 
 
@@ -34,7 +54,7 @@
       <div class="heading">Settings</div>
       <hr/>
       <div class="text">Backup folder</div>
-      <div class="row"><input type="text" bind:value={backupPath}><div class="btn" title="Open folder" on:click="{openFolder}" on:keydown><img src="{folder}" alt="folder"></div></div>
+      <div class="row"><input class="{backupCSS}" type="text" bind:value={backupPath} on:change={checkPath}><div class="btn" title="Open folder" on:click="{openFolder}" on:keydown><img src="{folder}" alt="folder"></div></div>
     </div>
     <div class="row2">
       <div class="mbtn" on:click="{okay}" on:keydown>OK</div>
@@ -44,6 +64,9 @@
 </section>
 
 <style>
+.invalid{
+  border: 2px solid red;
+}
 .mbtn{
   font-size: 20px;
   background-color: var(--green);

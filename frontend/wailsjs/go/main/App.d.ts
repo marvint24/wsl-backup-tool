@@ -24,3 +24,5 @@ export function SetBackupPath(arg1:string):Promise<void>;
 export function ShutdownWsl():Promise<void>;
 
 export function TerminateWsl(arg1:string):Promise<void>;
+
+export function TestPath(arg1:string):Promise<boolean>;
