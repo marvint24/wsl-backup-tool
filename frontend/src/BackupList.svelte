@@ -113,7 +113,8 @@ p{
   color: var(--dark);
   font-size: 20px;
   font-weight: 500;
-  white-space: nowrap 
+  white-space: nowrap;
+  padding-bottom: 20px;
 }
 table{
   width: 95%;
