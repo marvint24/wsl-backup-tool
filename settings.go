@@ -21,10 +21,12 @@ func (a *App) init() {
 	}
 
 	json.Unmarshal(settingsFile, &currentSettings)
+}
+
+func (a *App) onload() {
 	if !a.TestPath(currentSettings.BackupPath) {
 		runtime.EventsEmit(a.ctx, "openSettings", nil)
 	}
-
 }
 
 type settingsType struct {

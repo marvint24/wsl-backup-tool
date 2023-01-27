@@ -12,6 +12,9 @@
   let backupCSS: string
   async function checkPath():Promise<boolean>{
     let returnVal:boolean
+    if(backupPath.endsWith("\\")){
+      backupPath=backupPath.slice(0,-1)
+    }
     await TestPath(backupPath).then((res)=>{
       if(res){
         backupCSS=null

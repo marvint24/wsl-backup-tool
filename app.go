@@ -20,3 +20,7 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 	a.init()
 }
+
+func (a *App) domReady(ctx context.Context) {
+	a.onload()
+}

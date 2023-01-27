@@ -1,10 +1,10 @@
 <script lang="ts">
   import {GetWslList} from '../wailsjs/go/main/App.js'
+  import {EventsOn} from '../wailsjs/runtime/runtime.js'
   import WslList from './WslList.svelte'
   import {distros,refresh,selectedWindow} from './store'
   import refreshsvg from './assets/refresh.svg'
   import sliders from './assets/sliders.svg'
-  import {Events} from '@wails/runtime'
 
   // import Testa from './Testa.svelte'
 
@@ -49,7 +49,14 @@
   }
 
   //Global event listeners
+  EventsOn("openSettings",()=>{
+    console.log("openSettings")
+    openSettings()
+  })
 
+  EventsOn("hi",()=>{
+    console.log("naa")
+  })
 
 </script>
   
