@@ -86,7 +86,7 @@ func (a *App) GetSettings() string {
 func (a *App) TestPath(path string) bool {
 	_, err := os.Stat(path)
 	if err != nil {
-		a.log(2, err.Error())
+		a.log(2, "Backupfolder: "+err.Error())
 	}
 	return err == nil
 }
