@@ -2,14 +2,16 @@
   import folder from "./assets/folder.svg";
   import {SetSettings,SelectFolder,TestPath} from '../wailsjs/go/main/App.js'
   import {selectedWindow,settings} from './store'
+  import {EventsEmit} from '../wailsjs/runtime/runtime.js'
 
+  let tempSettings=JSON.parse(JSON.stringify($settings))
 
   async function checkPath(){
-    if($settings.BackupPath.endsWith("\\")){
-      $settings.BackupPath=$settings.BackupPath.slice(0,-1)
+    if(tempSettings.BackupPath.endsWith("\\")){
+      tempSettings.BackupPath=tempSettings.BackupPath.slice(0,-1)
     }
     let el=<HTMLInputElement>document.getElementById("BackupPath-Setting")
-    await TestPath($settings.BackupPath).then((res)=>{
+    await TestPath(tempSettings.BackupPath).then((res)=>{
       if(res){
         el.setCustomValidity("")
       }else{
@@ -18,12 +20,14 @@
     })
   }
 
-  checkPath()
+  window.onload=()=>{
+    checkPath()
+  }
 
   function openFolder(){
     SelectFolder().then((result)=>{
       if(result){
-        $settings.BackupPath=result
+        tempSettings.BackupPath=result
         checkPath()
       }  
     })
@@ -35,8 +39,11 @@
 
   function okay(){
     if((<HTMLFormElement>document.getElementById("SettingsForm")).checkValidity()){
-      SetSettings(JSON.stringify($settings))
-      close()
+      $settings=tempSettings
+      SetSettings(JSON.stringify($settings)).then(()=>{
+        EventsEmit("SettingsChanged")
+        close()
+      })
     }
   }
 
@@ -45,13 +52,15 @@
 <section>
   <div>
     <div class="box">
+      <div class="heading">Settings</div>
+      <hr/>
       <form id="SettingsForm">
-        <div class="heading">Settings</div>
-        <hr/>
+        
         <div class="text">Backup folder</div>
-        <div class="row"><input id="BackupPath-Setting" type="text" bind:value={$settings.BackupPath} on:change={checkPath}><div class="btn" title="Open folder" on:click="{openFolder}" on:keydown><img src="{folder}" alt="folder"></div></div>
+        <div class="row"><input id="BackupPath-Setting" class="long" type="text" bind:value={tempSettings.BackupPath} on:change={checkPath}><div class="btn" title="Open folder" on:click="{openFolder}" on:keydown><img src="{folder}" alt="folder"></div></div>
         <div class="text">Refresh interval</div>
-        <div class="row"><input id="RefreshInterval-Setting" title="in seconds" min="1" type="number" bind:value={$settings.RefreshInterval}></div>
+        <div class="row"><input title="in seconds" min="1" type="number" bind:value={tempSettings.RefreshInterval}></div>
+        <div class="row"><div class="text">Show console</div><input id="ShowConsole-Setting" type="checkbox" bind:checked={tempSettings.ShowConsole}></div>
       </form>
       </div>
     <div class="row2">
@@ -62,6 +71,11 @@
 </section>
 
 <style>
+#ShowConsole-Setting{
+  min-width: 20px;
+  height: 20px;
+  margin: 4.5px 0 10px 10px;
+}
 .mbtn{
   font-size: 20px;
   color: var(--white);
@@ -117,12 +131,17 @@ img{
   margin-right: 20px;
   margin-left: 3px;
 }
+.long{
+  min-width: 600px;
+}
+form{
+  margin: 0 0 20px 20px;
+}
 input{
   font-size: 20px;
-  margin: 0 0 20px 20px;
   border-radius: 10px;
   padding: 2px 10px 2px 10px;
-  min-width: 600px;
+  margin-bottom: 5px;
 }
 input:invalid{
   border: 2px solid red;
@@ -130,7 +149,6 @@ input:invalid{
 .text{
   color: var(--dark);
   font-size: 20px;
-  padding: 5px 0 0 25px;  
   text-align: left;
 }
 section {

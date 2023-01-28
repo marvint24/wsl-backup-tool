@@ -25,8 +25,20 @@
   })
 
   //Console resizer
+  EventsOn("SettingsChanged",()=>{
+    if($settings.ShowConsole){
+      initResizeVars()
+    }
+  })
+
   let resizer
   let element
+  function initResizeVars(){
+    resizer=document.getElementById("console-resizer")
+    element=document.getElementById("console")
+    resizer.addEventListener('mousedown', initResize, false)
+  }
+
   function initResize() {
     window.addEventListener('mousemove', Resize, false)
     window.addEventListener('mouseup', stopResize, false)
@@ -41,9 +53,9 @@
   }
   
   window.onload=()=>{
-    resizer=document.getElementById("console-resizer")
-    element=document.getElementById("console")
-    resizer.addEventListener('mousedown', initResize, false)
+    if($settings.ShowConsole){
+      initResizeVars()
+    }
   }
 
   //Global event listeners
@@ -69,10 +81,12 @@
     <div class="Settings" title="Settings" on:click="{openSettings}" on:keydown><img src="{sliders}" alt="sliders"><p>Settings</p></div>
   </section>
   <WslList/>
-  <section class="console-section">
-    <div id="console-resizer"></div>
-    <div id="console"><Console/></div>
-  </section>
+  {#if $settings.ShowConsole}
+    <section class="console-section">
+      <div id="console-resizer"></div>
+      <div id="console"><Console/></div>
+    </section>
+  {/if}
 </main>
 
 <style>

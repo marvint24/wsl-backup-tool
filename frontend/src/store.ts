@@ -5,7 +5,8 @@ export const distros = writable([])
 export const selectedWindow = writable("")
 export const settings = writable({
   BackupPath:"",
-  RefreshInterval:2
+  RefreshInterval:2,
+  ShowConsole:true
 })
 
 export const backupRenameWindow = writable({"name":null})

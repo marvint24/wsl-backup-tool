@@ -11,6 +11,7 @@ import (
 type settingsType struct {
 	BackupPath      string
 	RefreshInterval int
+	ShowConsole     bool
 }
 
 func (settings *settingsType) toString() string {
@@ -24,7 +25,7 @@ func (a *App) saveSettings(settings settingsType) {
 	}
 }
 
-var settingsFolder = os.Getenv("APPDATA") + "\\WSL Backup Tool.exe\\settings\\"
+var settingsFolder = os.Getenv("APPDATA") + "\\WSL_Backup_Tool.exe\\settings\\"
 var settingsFileName = settingsFolder + "settings.json"
 var currentSettings settingsType
 
@@ -32,6 +33,7 @@ func defaultSettings() {
 	currentSettings = settingsType{
 		BackupPath:      "",
 		RefreshInterval: 2,
+		ShowConsole:     true,
 	}
 }
 
