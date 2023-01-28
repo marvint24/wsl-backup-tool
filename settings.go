@@ -20,7 +20,7 @@ func (settings *settingsType) toString() string {
 
 func (a *App) saveSettings(settings settingsType) {
 	if err := os.WriteFile(settingsFileName, []byte(settings.toString()), os.ModePerm); err != nil {
-		a.log(2, err.Error())
+		a.log(2, "Cannot save settings: "+err.Error())
 	}
 }
 
@@ -38,9 +38,9 @@ func defaultSettings() {
 func (a *App) init() {
 	settingsFile, err := os.ReadFile(settingsFileName)
 	if err != nil {
-		a.log(1, err.Error())
+		a.log(1, "Cannot open settings file: "+err.Error())
 		if err := os.MkdirAll(settingsFolder, os.ModePerm); err != nil {
-			a.log(2, err.Error())
+			a.log(2, "Cannot create settings path: "+err.Error())
 		} else {
 			defaultSettings()
 			a.saveSettings(currentSettings)
@@ -86,7 +86,7 @@ func (a *App) GetSettings() string {
 func (a *App) TestPath(path string) bool {
 	_, err := os.Stat(path)
 	if err != nil {
-		a.log(2, "Backupfolder: "+err.Error())
+		a.log(2, "Cannot find backup folder: "+err.Error())
 	}
 	return err == nil
 }
@@ -94,7 +94,7 @@ func (a *App) TestPath(path string) bool {
 func (a *App) SelectFolder() string {
 	out, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{})
 	if err != nil {
-		a.log(2, err.Error())
+		a.log(2, "Cannot open backup folder: "+err.Error())
 	}
 	return out
 }

@@ -20,7 +20,7 @@ func runCommand(name string, args ...string) *exec.Cmd {
 func (a *App) TerminateWsl(name string) {
 	_, err := runCommand("wsl", "-t", name).Output()
 	if err != nil {
-		a.log(2, err.Error())
+		a.log(2, "Cannot terminate wsl ("+name+"): "+err.Error())
 	}
 }
 
@@ -80,23 +80,23 @@ func (a *App) CreateBackupFile(name string, filename string, breaker int) {
 	backupFile := backupPath + "\\" + filename
 
 	if _, err := os.ReadDir(backupPath); err != nil {
-		a.log(1, err.Error())
+		a.log(1, "Cannot open backup folder ("+backupPath+"): "+err.Error())
 		if err := os.MkdirAll(backupPath, os.ModePerm); err != nil {
-			a.log(2, err.Error())
+			a.log(2, "Cannot create backup folder ("+backupPath+"): "+err.Error())
 		}
 	}
 
 	out, err := runCommand("wsl", "--export", "--vhd", name, backupFile).Output()
 	if out != nil {
-		a.log(0, string(out))
+		a.log(0, "WSL export output ("+backupFile+"): "+string(out))
 	}
 	if err != nil {
-		a.log(2, err.Error())
+		a.log(2, "WSL export error ("+backupFile+"): "+err.Error())
 		if breaker >= 1 {
 			return
 		} else {
 			if _, err := runCommand("wsl", "--shutdown").Output(); err != nil {
-				a.log(2, "Cannot create backup file, error:\n"+err.Error())
+				a.log(2, "WSL shutdown error: "+err.Error())
 			}
 
 			breaker++
@@ -134,17 +134,17 @@ func (a *App) RenameBackupFile(name string, newName string, distroName string) {
 	newBackupFile := backupPath + "\\" + newName
 
 	if _, err := os.ReadFile(newBackupFile); err == nil {
-		a.log(2, "'"+newBackupFile+"'"+" already exists")
+		a.log(2, "("+newBackupFile+")"+" already exists")
 		return
 	}
 
 	err := os.Rename(backupFile, newBackupFile)
 	if err != nil {
-		a.log(2, err.Error())
+		a.log(2, "Cannot rename ("+backupFile+") to ("+newBackupFile+"): "+err.Error())
 		return
 	}
 
-	a.log(0, "Renamed: "+backupFile+" to "+newBackupFile)
+	a.log(0, "Renamed: ("+backupFile+") to ("+newBackupFile+")")
 
 }
 
@@ -152,7 +152,7 @@ func (a *App) OpenBackupFolder(distroName string) {
 	backupPath := currentSettings.BackupPath + "\\" + distroName
 	_, err := runCommand("explorer", backupPath).Output()
 	if err != nil {
-		a.log(2, err.Error())
+		a.log(2, "Cannot open backup folder ("+backupPath+"): "+err.Error())
 	}
 }
 
@@ -160,31 +160,31 @@ func (a *App) getDistroPath(disroName string) string {
 	regPath := `Software\Microsoft\Windows\CurrentVersion\Lxss`
 	lxss, err := registry.OpenKey(registry.CURRENT_USER, regPath, registry.READ)
 	if err != nil {
-		a.log(2, err.Error())
+		a.log(2, "Cannot open registry path ("+regPath+"): "+err.Error())
 	}
 	defer lxss.Close()
 
 	distros, err := lxss.ReadSubKeyNames(0)
 	if err != nil {
-		a.log(2, err.Error())
+		a.log(2, "Cannot read sub keys ("+regPath+"): "+err.Error())
 	}
 
 	for _, key := range distros {
 		skey, err := registry.OpenKey(registry.CURRENT_USER, regPath+`\`+key, registry.QUERY_VALUE)
 		if err != nil {
-			a.log(2, err.Error())
+			a.log(2, "Cannot open registry key ("+regPath+`\`+key+"): "+err.Error())
 		}
 		defer skey.Close()
 
 		name, _, err := skey.GetStringValue("DistributionName")
 		if err != nil {
-			a.log(2, err.Error())
+			a.log(2, "Cannot get DistributionName ("+regPath+`\`+key+"): "+err.Error())
 		}
 
 		if name == disroName {
 			ext4FileLocation, _, err := skey.GetStringValue("BasePath")
 			if err != nil {
-				a.log(2, err.Error())
+				a.log(2, "Cannot get BasePath ("+regPath+`\`+key+"): "+err.Error())
 			}
 			return ext4FileLocation
 		}
@@ -203,12 +203,11 @@ func (a *App) RestoreDistro(filename string, disroName string) {
 	for i := 0; i < 2; i++ {
 		if i == 1 {
 			a.ShutdownWsl()
-			a.log(0, "Shutting down WSL")
+			a.log(1, "Shutting down WSL")
 		}
 		_, err := runCommand("powershell", "-Command", "Rename-Item", ext4FileLocation, bakFile).Output()
 		if err != nil {
-			a.log(2, err.Error())
-			a.log(2, "Cannot rename: "+ext4FileLocation)
+			a.log(2, "Cannot rename ("+ext4FileLocation+"): "+err.Error())
 			if i == 1 {
 				return
 			}
@@ -220,31 +219,29 @@ func (a *App) RestoreDistro(filename string, disroName string) {
 	restoreFile := "'" + currentSettings.BackupPath + "\\" + disroName + "\\" + filename + "'"
 	_, err := runCommand("powershell", "-Command", "Copy-Item", restoreFile, ext4FileLocation).Output()
 	if err != nil {
-		a.log(2, err.Error())
-		a.log(2, "Cannot copy: "+restoreFile+" to "+ext4FileLocation)
+		a.log(2, "Cannot copy ("+restoreFile+") to ("+ext4FileLocation+"): "+err.Error())
 		return
 	}
 
 	_, err2 := runCommand("powershell", "-Command", "Remove-Item", bakFile).Output()
 	if err2 != nil {
-		a.log(2, err.Error())
-		a.log(2, "Cannot delete: "+bakFile)
+		a.log(2, "Cannot delete ("+bakFile+"): "+err.Error())
 	}
 
-	a.log(0, "Restored: "+restoreFile+" to "+ext4FileLocation)
+	a.log(0, "Restored: ("+restoreFile+") to ("+ext4FileLocation+")")
 
 }
 
 func (a *App) ShutdownWsl() {
 	_, err := runCommand("wsl", "--shutdown").Output()
 	if err != nil {
-		a.log(2, err.Error())
+		a.log(2, "WSL shutdown error: "+err.Error())
 	}
 }
 
 func (a *App) LaunchDistro(name string) {
 	_, err := runCommand("cmd", "/c", "start", "wsl", "-d", name, "--cd", "~").Output()
 	if err != nil {
-		a.log(2, err.Error())
+		a.log(2, "Cannot launch ("+name+"): "+err.Error())
 	}
 }
