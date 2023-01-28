@@ -38,8 +38,8 @@ export function SelectFolder() {
   return window['go']['main']['App']['SelectFolder']();
 }
 
-export function SetBackupPath(arg1) {
-  return window['go']['main']['App']['SetBackupPath'](arg1);
+export function SetSettings(arg1) {
+  return window['go']['main']['App']['SetSettings'](arg1);
 }
 
 export function ShutdownWsl() {

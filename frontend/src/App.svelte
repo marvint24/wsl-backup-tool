@@ -50,12 +50,7 @@
 
   //Global event listeners
   EventsOn("openSettings",()=>{
-    console.log("openSettings")
     openSettings()
-  })
-
-  EventsOn("hi",()=>{
-    console.log("naa")
   })
 
 </script>

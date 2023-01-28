@@ -19,7 +19,7 @@ export function RestoreDistro(arg1:string,arg2:string):Promise<void>;
 
 export function SelectFolder():Promise<string>;
 
-export function SetBackupPath(arg1:string):Promise<void>;
+export function SetSettings(arg1:string):Promise<void>;
 
 export function ShutdownWsl():Promise<void>;
 

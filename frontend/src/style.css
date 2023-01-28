@@ -31,3 +31,9 @@ img{
     height: 100vh;
     text-align: center;
 }
+
+button{
+    font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+}
