@@ -1,21 +1,10 @@
 <script lang="ts">
-import {refresh,selectedDistro,backupRenameWindow,selectedWindow} from './store'
+import {selectedDistro,backupRenameWindow,selectedWindow} from './store'
 import {RestoreDistro} from '../wailsjs/go/main/App.js'
 import cursor from './assets/cursor.svg'
 import restore from './assets/restore.svg'
 
 export var backupFile
-
-function refreshDistos(){
-    let i=1
-    let interval=setInterval(()=>{
-        if(i==5){
-            clearInterval(interval)
-        }
-        $refresh=true
-        i++
-    },1500)
-}
 
 function close(){
     $selectedWindow=null
@@ -28,7 +17,6 @@ function backupRename(){
 
 function restoreBackup(){
     RestoreDistro(backupFile.Name,$selectedDistro).then()
-    refreshDistos()
     close()
 }
 

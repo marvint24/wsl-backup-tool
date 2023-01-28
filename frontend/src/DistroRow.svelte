@@ -4,24 +4,12 @@ import terminal from './assets/terminal.svg'
 import backup from './assets/backup.svg'
 import list from './assets/list.svg'
 import stop from './assets/stop.svg'
-import {refresh,selectedWindow,selectedDistro} from './store'
+import {selectedWindow,selectedDistro} from './store'
 import {TerminateWsl,LaunchDistro} from '../wailsjs/go/main/App.js'
 export var distroRow
 
-function refreshDistos(){
-    let i=1
-    let interval=setInterval(()=>{
-        if(i==3){
-            clearInterval(interval)
-        }
-        $refresh=true
-        i++
-    },1500)
-}
-
 function launchDistro(){
     LaunchDistro(distroRow.Name)
-    refreshDistos()
 }
 
 function createBackup(){
@@ -35,7 +23,7 @@ function manageBackups(){
 }
 
 function terminate(){
-  TerminateWsl(distroRow.Name).then(refreshDistos)
+  TerminateWsl(distroRow.Name).then()
 }
     
 </script>

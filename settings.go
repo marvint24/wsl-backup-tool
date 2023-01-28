@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"os"
+	"time"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -49,7 +50,15 @@ func (a *App) init() {
 	json.Unmarshal(settingsFile, &currentSettings)
 }
 
+func (a *App) automaticRefresh() {
+	for {
+		runtime.EventsEmit(a.ctx, "refreshWSL", a.getWslList())
+		time.Sleep(time.Duration(currentSettings.RefreshInterval) * time.Second)
+	}
+}
+
 func (a *App) onload() {
+	go a.automaticRefresh()
 	if !a.TestPath(currentSettings.BackupPath) {
 		runtime.EventsEmit(a.ctx, "openSettings", nil)
 	}

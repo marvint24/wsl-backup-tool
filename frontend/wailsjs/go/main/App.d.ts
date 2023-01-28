@@ -7,8 +7,6 @@ export function GetBackupFiles(arg1:string):Promise<string>;
 
 export function GetSettings():Promise<string>;
 
-export function GetWslList():Promise<string>;
-
 export function LaunchDistro(arg1:string):Promise<void>;
 
 export function OpenBackupFolder(arg1:string):Promise<void>;

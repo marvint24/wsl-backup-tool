@@ -1,24 +1,12 @@
 <script lang="ts">
   import {CreateBackupFile,GetSettings} from '../wailsjs/go/main/App.js'
-  import {selectedWindow,selectedDistro,refresh} from './store'
+  import {selectedWindow,selectedDistro} from './store'
 
-  function refreshDistos(){
-    let i=1
-    let interval=setInterval(()=>{
-        if(i==5){
-            clearInterval(interval)
-        }
-        $refresh=true
-        i++
-    },1500)
-  }
- 
   let backupPath: string 
   GetSettings().then((result)=>{
     backupPath=JSON.parse(result).replaceBackupPath
   })
 
-  
   var backupFilename: string
   let now=new Date().toLocaleString()
   backupFilename=`${now}.vhdx`
@@ -43,7 +31,6 @@
   function createBackupFile(){
     removeIllegalCharacters()
     CreateBackupFile($selectedDistro,backupFilename,0).then()
-    refreshDistos()
     close()
   }
 </script>

@@ -1,9 +1,7 @@
 <script lang="ts">
-  import {GetWslList} from '../wailsjs/go/main/App.js'
   import {EventsOn} from '../wailsjs/runtime/runtime.js'
   import WslList from './WslList.svelte'
-  import {distros,refresh,selectedWindow} from './store'
-  import refreshsvg from './assets/refresh.svg'
+  import {distros,selectedWindow} from './store'
   import sliders from './assets/sliders.svg'
 
   // import Testa from './Testa.svelte'
@@ -18,39 +16,21 @@
     Settings
   }
 
-   function getWslDistros(): void {
-    GetWslList().then((result)=> {
-      let jsonObj=JSON.parse(result)
-      $distros=jsonObj.map((obj)=>{
-        obj.uuid=crypto.randomUUID()
-        return obj
-      })      
-    })
-  }
-
   function openSettings(): void {
     $selectedWindow="Settings"
-  }
-
-  var spinClass=""
-  function refreshWslList(): void {
-    spinClass="spin"
-    getWslDistros()
-    setTimeout(()=>{spinClass=""},1000)
-  }
- 
-  getWslDistros()
-
-  $:{
-    if($refresh){
-      refreshWslList()
-      $refresh = false
-    }
   }
 
   //Global event listeners
   EventsOn("openSettings",()=>{
     openSettings()
+  })
+
+  EventsOn("refreshWSL",(result)=>{
+    let jsonObj=JSON.parse(result)
+    $distros=jsonObj.map((obj)=>{
+      obj.uuid=crypto.randomUUID()
+      return obj
+    })      
   })
 
 </script>
@@ -61,7 +41,6 @@
   {/if}
   <section class="header">
     <div class="Settings" title="Settings" on:click="{openSettings}" on:keydown><img src="{sliders}" alt="sliders"><p>Settings</p>  </div>
-    <div class="Refresh" title="Refresh" on:click="{refreshWslList}" on:keydown><img class="{spinClass}" src="{refreshsvg}" alt="refresh"></div>
   </section>
   <WslList/>
   <!-- <Testa/> -->
@@ -86,9 +65,6 @@ img{
   margin: 10px 0 10px 5px;
   font-weight: 500;
 }
-.Refresh{
-  border-radius: 0 0 0 15px;
-}
 .header>div{
   display: flex;
   flex-direction: row;
@@ -100,16 +76,4 @@ img{
 .header>div:hover{
   cursor: pointer;
 }
-
-@keyframes spin {
-  from {transform: rotate(0);}
-  to   {transform: rotate(180deg);}
-}
-.spin{
-  animation-name: spin;
-  animation-duration: 1s;
-  animation-iteration-count:1;
-}
-
-
 </style>

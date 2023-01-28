@@ -14,10 +14,6 @@ export function GetSettings() {
   return window['go']['main']['App']['GetSettings']();
 }
 
-export function GetWslList() {
-  return window['go']['main']['App']['GetWslList']();
-}
-
 export function LaunchDistro(arg1) {
   return window['go']['main']['App']['LaunchDistro'](arg1);
 }

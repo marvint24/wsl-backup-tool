@@ -24,7 +24,7 @@ func (a *App) TerminateWsl(name string) {
 	}
 }
 
-func (a *App) GetWslList() string {
+func (a *App) getWslList() string {
 	type wslLine struct {
 		Default_    bool
 		Name        string

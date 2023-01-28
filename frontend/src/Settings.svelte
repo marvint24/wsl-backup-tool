@@ -35,14 +35,11 @@
     })
   }
 
-
-
   function close(){
     $selectedWindow=null
   }
 
-  async function okay(){
-    console.log(settings)
+  function okay(){
     if((<HTMLFormElement>document.getElementById("SettingsForm")).checkValidity()){
       SetSettings(JSON.stringify(settings))
       close()
