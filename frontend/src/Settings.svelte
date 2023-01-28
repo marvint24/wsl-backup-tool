@@ -31,6 +31,7 @@
     SelectFolder().then((result)=>{
       if(result){
         settings.BackupPath=result
+        checkPath()
       }  
     })
   }
