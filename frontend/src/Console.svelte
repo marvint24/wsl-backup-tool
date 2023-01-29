@@ -1,21 +1,19 @@
 <script lang="ts">
+  import {EventsOn} from '../wailsjs/runtime/runtime.js'
 
-
+  let logs: string[]
+  logs = []
+  EventsOn("consoleLog",(data)=>{
+      console.log(logs)
+      logs.push(data)
+      logs=logs
+  })
 </script>
 
 <section>
-<p>hi</p>
-<p>hina</p>
-<p>...na</p>
-<p>ii.na</p>
-<p>hina</p>
-<p>...na</p>
-<p>ii.na</p>
-<p>hina</p>
-<p>...na</p>
-<p>ii.na</p>
-
-
+  {#each logs as log,index (index)}
+    <p>{log}</p>
+  {/each}
 </section>
 
 

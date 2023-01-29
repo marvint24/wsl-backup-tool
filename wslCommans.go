@@ -24,6 +24,17 @@ func (a *App) TerminateWsl(name string) {
 	}
 }
 
+func removeEmptyChars(str string) string {
+	newArr := make([]byte, 0)
+	for _, letter := range str {
+		if letter == 0 {
+			continue
+		}
+		newArr = append(newArr, byte(letter))
+	}
+	return string(newArr)
+}
+
 func (a *App) getWslList() string {
 	type wslLine struct {
 		Default_    bool
@@ -33,16 +44,8 @@ func (a *App) getWslList() string {
 	}
 
 	out, _ := runCommand("wsl", "-l", "-v").Output()
-	// Remove empty chars
-	newArr := make([]byte, 0)
-	for _, letter := range out {
-		if letter == 0 {
-			continue
-		}
-		newArr = append(newArr, letter)
-	}
 
-	commandStr := string(newArr)
+	commandStr := removeEmptyChars(string(out))
 	rows := strings.Split(commandStr, "\n")
 
 	nameStart := strings.Index(rows[0], "NAME")
