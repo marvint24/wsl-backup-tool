@@ -23,6 +23,7 @@ section{
   font-family: Consolas;
   font-size: 14px;
   height: 100%;
+  overflow-wrap: break-word;
 }
 p{
   position: left;
