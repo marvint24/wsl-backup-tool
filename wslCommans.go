@@ -8,6 +8,8 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/wailsapp/wails/v2/pkg/runtime"
+
 	"golang.org/x/sys/windows/registry"
 )
 
@@ -98,8 +100,8 @@ func (a *App) CreateBackupFile(name string, filename string, breaker int) {
 		if breaker >= 1 {
 			return
 		} else {
-			if _, err := runCommand("wsl", "--shutdown").Output(); err != nil {
-				a.log(2, "WSL shutdown error: "+err.Error())
+			if !a.RequestShutdownWsl() {
+				return
 			}
 
 			breaker++
@@ -205,8 +207,9 @@ func (a *App) RestoreDistro(filename string, disroName string) {
 
 	for i := 0; i < 2; i++ {
 		if i == 1 {
-			a.ShutdownWsl()
-			a.log(1, "Shutting down WSL")
+			if !a.RequestShutdownWsl() {
+				return
+			}
 		}
 		_, err := runCommand("powershell", "-Command", "Rename-Item", ext4FileLocation, bakFile).Output()
 		if err != nil {
@@ -235,10 +238,42 @@ func (a *App) RestoreDistro(filename string, disroName string) {
 
 }
 
-func (a *App) ShutdownWsl() {
+func (a *App) shutdownWsl() {
+	a.log(1, "WSL shutting down")
 	_, err := runCommand("wsl", "--shutdown").Output()
 	if err != nil {
 		a.log(2, "WSL shutdown error: "+err.Error())
+	}
+}
+
+func (a *App) openWslShutdownWindow(c chan bool) {
+	unregisterEvents := func(optionalData ...interface{}) {
+		runtime.EventsOff(a.ctx, "WslShutdownConfirmed", "WslShutdownCanceled")
+	}
+	runtime.EventsOn(a.ctx, "WslShutdownConfirmed", func(optionalData ...interface{}) {
+		unregisterEvents()
+		c <- true
+	})
+	runtime.EventsOn(a.ctx, "WslShutdownCanceled", func(optionalData ...interface{}) {
+		unregisterEvents()
+		c <- false
+	})
+}
+
+func (a *App) RequestShutdownWsl() bool {
+	a.log(1, "WSL shutdown needed")
+	runtime.EventsEmit(a.ctx, "openWslShutdown", nil)
+	c := make(chan bool)
+	go a.openWslShutdownWindow(c)
+
+	res := <-c
+	if res {
+		a.log(0, "WSL shutdown confirmed")
+		a.shutdownWsl()
+		return true
+	} else {
+		a.log(2, "WSL shutdown canceled")
+		return false
 	}
 }
 

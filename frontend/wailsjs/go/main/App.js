@@ -26,6 +26,10 @@ export function RenameBackupFile(arg1, arg2, arg3) {
   return window['go']['main']['App']['RenameBackupFile'](arg1, arg2, arg3);
 }
 
+export function RequestShutdownWsl() {
+  return window['go']['main']['App']['RequestShutdownWsl']();
+}
+
 export function RestoreDistro(arg1, arg2) {
   return window['go']['main']['App']['RestoreDistro'](arg1, arg2);
 }
@@ -36,10 +40,6 @@ export function SelectFolder() {
 
 export function SetSettings(arg1) {
   return window['go']['main']['App']['SetSettings'](arg1);
-}
-
-export function ShutdownWsl() {
-  return window['go']['main']['App']['ShutdownWsl']();
 }
 
 export function TerminateWsl(arg1) {

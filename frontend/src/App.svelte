@@ -1,7 +1,7 @@
 <script lang="ts">
   import {EventsOn} from '../wailsjs/runtime/runtime.js'
   import WslList from './WslList.svelte'
-  import {distros,selectedWindow,settings} from './store'
+  import {distros,selectedWindow,settings,shutdownWindow} from './store'
   import sliders from './assets/sliders.svg'
   import Console from './Console.svelte'
   import {GetSettings} from '../wailsjs/go/main/App.js'
@@ -9,6 +9,8 @@
   import BackupCreate from './BackupCreate.svelte'
   import BackupList from './BackupList.svelte'
   import Settings from './Settings.svelte'
+
+  import WslShutdown from './WslShutdown.svelte'
 
   const imported = {
     BackupCreate,
@@ -71,9 +73,16 @@
     })      
   })
 
+  EventsOn("openWslShutdown",()=>{
+    $shutdownWindow=true
+    console.log("openWslShutdownasdfsd")
+  })
 </script>
   
 <main>
+  {#if $shutdownWindow}
+    <WslShutdown/>
+  {/if}
   {#if selectedWindow}
     <svelte:component this={imported[$selectedWindow]} />
   {/if}

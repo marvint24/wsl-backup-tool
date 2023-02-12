@@ -13,13 +13,13 @@ export function OpenBackupFolder(arg1:string):Promise<void>;
 
 export function RenameBackupFile(arg1:string,arg2:string,arg3:string):Promise<void>;
 
+export function RequestShutdownWsl():Promise<boolean>;
+
 export function RestoreDistro(arg1:string,arg2:string):Promise<void>;
 
 export function SelectFolder():Promise<string>;
 
 export function SetSettings(arg1:string):Promise<void>;
-
-export function ShutdownWsl():Promise<void>;
 
 export function TerminateWsl(arg1:string):Promise<void>;
 
