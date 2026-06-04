@@ -25,13 +25,13 @@ function restoreBackup(){
 
 
 
-<tr>
-  <td>{backupFile.Name}</td>
-  <td>{backupFile.ModDate}</td>
+<tr class="row">
+  <td class="col-name">{backupFile.Name}</td>
+  <td class="col-date">{backupFile.ModDate}</td>
   <td>
     <div class="btns">
-        <img title="Rename backup" on:click={backupRename} on:keydown src="{cursor}" alt="terminal">
-        <img title="Restore backup" on:click={restoreBackup} on:keydown src="{restore}" alt="backup">
+        <button class="icon-btn" title="Rename backup" on:click={backupRename}><img src="{cursor}" alt="rename"></button>
+        <button class="icon-btn" title="Restore backup" on:click={restoreBackup}><img src="{restore}" alt="restore"></button>
     </div>
   </td>
 </tr>
@@ -39,46 +39,44 @@ function restoreBackup(){
 
 
 <style>
-td>div>img{
-    cursor: pointer;
-}
-.btns{
-  user-select: none;
-}
-.btns>img{
-  margin-left: 15px;
-}
-img{
-    height: 25px;
-    filter: invert(88%) sepia(8%) saturate(1480%) hue-rotate(178deg) brightness(106%) contrast(104%);
-    padding-top: 5px;
-}
-tr{
-    background-color: var(--dark);
-    border-radius: 50px;
-}
-td{
+.row td {
+    background-color: var(--surface-2);
+    color: var(--text);
+    font-size: 14px;
+    height: 48px;
     text-align: left;
-    color: var(--white);
-    font-size: 20px;
-    height: 44px;
-    padding-left: 25px;
+    padding-left: 16px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.12s ease;
 }
-tr>td:last-child{
-    border-left-width: 2px;
-    border-right-width:0;
-    border-top-width:0;
-    border-bottom-width:0;
-    border-width: 2px,0px,0px,0px; 
-    border-color: var(--green-light);
-    border-style: solid;
+.row:hover td {
+    background-color: var(--surface-3);
+}
+.col-name {
+    font-weight: 600;
+}
+.col-date {
+    color: var(--text-dim);
+    white-space: nowrap;
 }
 td:first-child {
-    border-top-left-radius: 15px; 
-    border-bottom-left-radius: 15px;
+    border-top-left-radius: var(--radius);
+    border-bottom-left-radius: var(--radius);
+    border-left: 1px solid var(--border);
 }
 td:last-child {
-    border-bottom-right-radius: 15px; 
-    border-top-right-radius: 15px; 
+    border-top-right-radius: var(--radius);
+    border-bottom-right-radius: var(--radius);
+    border-right: 1px solid var(--border);
+    padding-left: 0;
+}
+.btns {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    padding-right: 10px;
+    user-select: none;
 }
 </style>

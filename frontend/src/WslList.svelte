@@ -5,56 +5,48 @@
 
 </script>
 
-<div>
-  <section>
-    <table>
-        <tr>
-            <td>Default</td>
-            <td>Name</td>
-            <td>Status</td>
-            <td>WSL-Version</td>
-            <td></td>
+<section class="list-scroll">
+  <table>
+      <thead>
+        <tr class="col-head">
+            <th>Default</th>
+            <th>Name</th>
+            <th>Status</th>
+            <th>WSL Version</th>
+            <th></th>
         </tr>
+      </thead>
+      <tbody>
         {#each $distros as distroRow (distroRow.uuid)}
             <DistroRow distroRow={distroRow}/>
         {/each}
-    </table>
-  </section>
-</div>
+      </tbody>
+  </table>
+</section>
 
 <style>
-section {
+.list-scroll {
+  flex: 1 1 auto;
   overflow: auto;
-  max-height: calc(100vh - 97px);
+  padding: 12px 16px;
+  min-height: 0;
 }
-table{
-  width: 97%;
-  margin-left: auto;
-  margin-right: auto;
-  border-spacing: 0 10px;
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
 }
-td{
+.col-head th {
   text-align: left;
-  color: var(--white);
-  font-size: 20px;
+  color: var(--text-faint);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0 18px 4px 18px;
 }
-tr td:first-child , tr td:nth-child(4){
+.col-head th:first-child,
+.col-head th:nth-child(4) {
   text-align: center;
-}
-
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: hwb(0 0% 100% / 0);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--white);
-  border-radius: 5px;
-}
-div{
-  padding: 0 8px 0 8px;
 }
 </style>

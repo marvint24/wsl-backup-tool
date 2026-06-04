@@ -1,39 +1,282 @@
 :root {
-    --dark: #1b2636;
-    --dark-op: rgba(27, 38, 54, 0.87);
-    --white: #d0f6ff;
-    --green-light: rgba(1, 255, 246, 0.1);
-    --green: rgb(5, 138, 134);;
-    --gray:rgba(178, 181, 177, 0.15);
-  }
+    /* Surfaces */
+    --bg: #0d1117;
+    --surface: #161c27;
+    --surface-2: #1d2433;
+    --surface-3: #28313f;
+    --surface-hover: rgba(148, 163, 184, 0.08);
+
+    /* Borders */
+    --border: rgba(148, 163, 184, 0.14);
+    --border-strong: rgba(148, 163, 184, 0.24);
+
+    /* Text */
+    --text: #e6edf3;
+    --text-dim: #93a1b3;
+    --text-faint: #64748b;
+
+    /* Accent (teal/cyan brand) */
+    --accent: #2dd4bf;
+    --accent-hover: #5eead4;
+    --accent-soft: rgba(45, 212, 191, 0.13);
+    --accent-border: rgba(45, 212, 191, 0.35);
+
+    /* Status */
+    --ok: #34d399;
+    --danger: #f87171;
+    --danger-soft: rgba(248, 113, 113, 0.13);
+
+    /* Shape */
+    --radius-sm: 8px;
+    --radius: 12px;
+    --radius-lg: 16px;
+
+    /* Elevation */
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.35);
+
+    /* Legacy aliases (kept so existing references still resolve) */
+    --dark: var(--surface);
+    --dark-op: rgba(8, 11, 16, 0.72);
+    --white: var(--text);
+    --green-light: var(--accent-soft);
+    --green: var(--accent);
+    --gray: var(--surface-2);
+
+    --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system,
+        BlinkMacSystemFont, "Roboto", "Helvetica Neue", sans-serif;
+    --font-mono: "Cascadia Code", "Cascadia Mono", Consolas, "Courier New", monospace;
+}
+
+* {
+    box-sizing: border-box;
+}
 
 html {
-    background-color: var(--dark);
+    background-color: var(--bg);
     text-align: center;
-    color: white;
+    color: var(--text);
 }
 
 body {
     margin: 0;
-    color: white;
-    font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+    color: var(--text);
+    font-family: var(--font);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
-img{
+img {
     -webkit-user-drag: none;
     user-select: none;
 }
-
 
 #app {
     height: 100vh;
     text-align: center;
 }
 
-button{
-    font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+button {
+    font-family: var(--font);
+}
+
+/* ----------------------------------------------------------------------
+   Shared UI kit (global, used across all modal components)
+   ---------------------------------------------------------------------- */
+
+/* Dialog overlay + card */
+.modal-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--dark-op);
+    backdrop-filter: blur(4px);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    animation: overlay-in 0.12s ease-out;
+}
+@keyframes overlay-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 640px;
+    max-height: calc(100vh - 48px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modal-in 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal--wide {
+    max-width: min(960px, 95vw);
+}
+@keyframes modal-in {
+    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-header {
+    padding: 18px 22px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+.modal-title {
+    margin: 0;
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+.modal-title strong {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.modal-body {
+    padding: 20px 22px;
+    text-align: left;
+    overflow: auto;
+}
+
+.modal-footer {
+    padding: 16px 22px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    border-top: 1px solid var(--border);
+}
+
+/* Buttons */
+.btn {
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background-color 0.12s ease, border-color 0.12s ease,
+        color 0.12s ease, transform 0.06s ease;
+    user-select: none;
+}
+.btn:active {
+    transform: translateY(1px);
+}
+.btn-primary {
+    background-color: var(--accent);
+    color: #06231f;
+}
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+}
+.btn-ghost {
+    background-color: transparent;
+    color: var(--text-dim);
+    border-color: var(--border-strong);
+}
+.btn-ghost:hover {
+    background-color: var(--surface-hover);
+    color: var(--text);
+}
+.btn-danger {
+    background-color: var(--danger);
+    color: #2a0a0a;
+}
+.btn-danger:hover {
+    background-color: #fca5a5;
+}
+
+/* Icon button (square, for SVG glyphs) */
+.icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
+    padding: 0;
+}
+.icon-btn:hover {
+    background-color: var(--surface-hover);
+    border-color: var(--border);
+}
+.icon-btn.danger:hover {
+    background-color: var(--danger-soft);
+}
+.icon-btn img {
+    height: 18px;
+    width: 18px;
+    /* tints SVG glyphs to the light text color */
+    filter: invert(88%) sepia(8%) saturate(1480%) hue-rotate(178deg)
+        brightness(106%) contrast(104%);
+    pointer-events: none;
+}
+
+/* Form fields */
+.field-label {
+    display: block;
+    color: var(--text-dim);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 7px;
+    text-align: left;
+}
+.input {
+    width: 100%;
+    font-family: var(--font);
+    font-size: 14px;
+    color: var(--text);
+    background-color: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.input::placeholder {
+    color: var(--text-faint);
+}
+.input:focus {
+    outline: none;
+    border-color: var(--accent-border);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.input:invalid {
+    border-color: var(--danger);
+}
+.input:invalid:focus {
+    box-shadow: 0 0 0 3px var(--danger-soft);
+}
+
+/* Global scrollbars */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--surface-3);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--border-strong);
+    background-clip: padding-box;
 }

@@ -16,70 +16,42 @@
   
   
   
-<section>
-  <div>
-    <div class="box">
-      <div class="heading">WSL Shutdown needed!</div>
-      <hr/>
-      <div class="text">To continue the current action, WSL needs to be shutdown.<br>Do you want to continue? (Potential data loss)</div>
+<section class="modal-overlay shutdown-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">WSL shutdown required</h2>
     </div>
-    <div class="row2">
-      <div class="mbtn" on:click="{shutdown}" on:keydown>OK</div>
-      <div class="mbtn" on:click="{close}" on:keydown>Cancel</div>
+    <div class="modal-body">
+      <p class="text">To continue the current action, WSL needs to be shut down.</p>
+      <p class="warning">⚠ All running distributions will stop &mdash; unsaved work may be lost.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" on:click="{close}">Cancel</button>
+      <button class="btn btn-danger" on:click="{shutdown}">Shut down WSL</button>
     </div>
   </div>
 </section>
 
 
 <style>
-  .mbtn{
-    font-size: 20px;
-    background-color: var(--green);
-    border-radius: 10px;
-    padding: 4px 8px 4px 8px;
-    margin: 0 10px 0 0;
-    cursor: pointer;
+  .shutdown-overlay {
+    z-index: 30;
   }
-  .row2{
-    position: relative;
-    top: 10px;
-    right: -420px;
-    display: flex;
-    width: 0%;
-    flex-direction: row;
+  .text {
+    color: var(--text);
+    font-size: 15px;
+    margin: 0 0 12px 0;
+    line-height: 1.5;
   }
-  .box{
-    background-color: var(--white);
-    border-radius: 15px;
-  }
-  .heading{
-    color: var(--dark);
-    font-size: 20px;
+  .warning {
+    color: var(--danger);
+    background: var(--danger-soft);
+    border: 1px solid rgba(248, 113, 113, 0.25);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    font-size: 13.5px;
     font-weight: 500;
-    padding: 5px 0 0 25px;  
-    white-space: nowrap;
-    text-align: left;
+    margin: 0;
+    line-height: 1.45;
   }
-  .text{
-    color: var(--dark);
-    font-size: 20px;
-    padding: 5px 25px 25px 25px; 
-    text-align: left; 
-  }
-  hr{
-    border: none;
-    border-top: 2px solid var(--dark);
-    margin-bottom: 15px;
-  }
-  section {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-color:var(--dark-op);
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  </style>
+</style>
