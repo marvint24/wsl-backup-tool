@@ -41,142 +41,68 @@
   
   
   
-<section class="window">
+<section class="modal-overlay">
   {#if $backupRenameWindow.name != null}
     <BackupRename/>
   {/if}
-  <div>
-    <div class="box">
-      <div class="heading">Manage backup files for {$selectedDistro}</div>
-      <hr/>
-      <section>
-        {#if backupFiles.length!=0}
-        <div class="scroll">
-          <table>
-              <tr>
-                <td>Name</td>
-                <td>Created</td>
-                <td><div class="btn" title="Open folder" on:click="{openFolder}" on:keydown><img src="{folder}" alt="folder"></div></td>
-              </tr>
-                {#each backupFiles as item (item.uuid)}
-                  <BackupListRow backupFile={item}/>
-                {/each}
-          </table>
-        </div>
-        {:else}
-          <p>There are no files {":("}</p>
-        {/if}
-      </section>
-
+  <div class="modal modal--wide">
+    <div class="modal-header header-row">
+      <h2 class="modal-title">Manage backups for <strong>{$selectedDistro}</strong></h2>
+      <button class="icon-btn" title="Open folder" on:click="{openFolder}"><img src="{folder}" alt="folder"></button>
     </div>
-    <div class="row2">
-      <div class="mbtn" on:click="{close}" on:keydown>Close</div>
+    <div class="modal-body">
+      {#if backupFiles.length!=0}
+        <table class="backup-table">
+            <thead>
+              <tr class="col-head">
+                <th>Name</th>
+                <th>Created</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {#each backupFiles as item (item.uuid)}
+                <BackupListRow backupFile={item}/>
+              {/each}
+            </tbody>
+        </table>
+      {:else}
+        <p class="empty">No backup files yet.</p>
+      {/if}
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" on:click="{close}">Close</button>
     </div>
   </div>
 </section>
 
 
 <style>
-section {
-  padding: 0 5px 0 5px;
-}
-.scroll{
-  overflow: auto;
-  max-height: calc(100vh - 152px);
-}
-::-webkit-scrollbar {
-  width: 10px;
-}
-::-webkit-scrollbar-track {
-  background: hwb(0 0% 100% / 0);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--dark);
-  border-radius: 5px;
-}
-
-img{
-  padding: 3px 0 0 0;
-  height: 22px;
-}
-.btn{
-  border-width: 1px;
-  border: solid;
-  border-color: var(--dark);
-  background-color: white;
-  border-radius: 8px;
-  width: 34px;
-  height: 28px;
-  cursor: pointer;
-}
-p{
-  color: var(--dark);
-  font-size: 20px;
-  font-weight: 500;
-  white-space: nowrap;
-  padding-bottom: 20px;
-}
-table{
-  width: 95%;
-  margin-left: auto;
-  margin-right: auto;
-  border-spacing: 0 10px;
-  margin-bottom: 20px;
-}
-td{
-    text-align: left;
-    color: var(--dark);
-    font-size: 20px;
-    padding-left: 25px;
-}
-td:nth-child(3){
-  display: flex;
-  justify-content: right;
-  text-align: center;
-}
-.mbtn{
-  font-size: 20px;
-  background-color: var(--green);
-  border-radius: 10px;
-  padding: 4px 8px 4px 8px;
-  margin: 0 10px 0 0;
-  cursor: pointer;
-}
-.row2{
-  position: relative;
-  top: 10px;
-  margin-left: auto; 
-  margin-right: 80px;
-  display: flex;
-  width: 0%;
-  flex-direction: row;
-}
-.box{
-  background-color: var(--white);
-  border-radius: 15px;
-  width: 95vw;
-}
-.heading{
-  color: var(--dark);
-  font-size: 20px;
-  font-weight: 500;
-  padding: 5px 0 0 25px; 
-  text-align: left;
-  white-space: nowrap 
-}
-hr{
-  border: none;
-  border-top: 2px solid var(--dark);
-  margin-bottom: 15px;
-}
-.window {
-  position: absolute;
-  width: calc(100% - 10px);
-  height: 100%;
-  background-color:var(--dark-op);
-  z-index: 1;
+.header-row {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 16px;
 }
-  </style>
+.empty {
+  color: var(--text-dim);
+  font-size: 15px;
+  text-align: center;
+  padding: 28px 0;
+  margin: 0;
+}
+.backup-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+.col-head th {
+  text-align: left;
+  color: var(--text-faint);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0 16px 2px 16px;
+}
+</style>

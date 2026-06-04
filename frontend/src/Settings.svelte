@@ -49,117 +49,138 @@
 
 </script>
 
-<section>
-  <div>
-    <div class="box">
-      <div class="heading">Settings</div>
-      <hr/>
+<section class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Settings</h2>
+    </div>
+    <div class="modal-body">
       <form id="SettingsForm">
-        
-        <div class="text">Backup folder</div>
-        <div class="row"><input id="BackupPath-Setting" class="long" type="text" bind:value={tempSettings.BackupPath} on:change={checkPath}><div class="btn" title="Open folder" on:click="{openFolder}" on:keydown><img src="{folder}" alt="folder"></div></div>
-        <div class="text">Refresh interval</div>
-        <div class="row"><input title="in seconds" min="1" type="number" bind:value={tempSettings.RefreshInterval}></div>
-        <div class="row"><div class="text">Show console</div><input id="ShowConsole-Setting" type="checkbox" bind:checked={tempSettings.ShowConsole}></div>
+        <div class="field">
+          <label class="field-label" for="BackupPath-Setting">Backup folder</label>
+          <div class="path-row">
+            <input id="BackupPath-Setting" class="input" type="text" bind:value={tempSettings.BackupPath} on:change={checkPath}>
+            <button type="button" class="icon-btn path-btn" title="Browse for folder" on:click="{openFolder}"><img src="{folder}" alt="folder"></button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="RefreshInterval-Setting">Refresh interval (seconds)</label>
+          <input id="RefreshInterval-Setting" class="input input-narrow" title="in seconds" min="1" type="number" bind:value={tempSettings.RefreshInterval}>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Show console</div>
+            <div class="toggle-hint">Display the live log panel at the bottom of the window</div>
+          </div>
+          <label class="switch">
+            <input id="ShowConsole-Setting" type="checkbox" bind:checked={tempSettings.ShowConsole}>
+            <span class="slider"></span>
+          </label>
+        </div>
       </form>
-      </div>
-    <div class="row2">
-      <button class="mbtn" on:click="{okay}" on:keydown>OK</button>
-      <button class="mbtn" on:click="{close}" on:keydown>Cancel</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" on:click="{close}">Cancel</button>
+      <button class="btn btn-primary" on:click="{okay}">Save</button>
     </div>
   </div>
 </section>
 
 <style>
-#ShowConsole-Setting{
-  min-width: 20px;
-  height: 20px;
-  margin: 4.5px 0 10px 10px;
-}
-.mbtn{
-  font-size: 20px;
-  color: var(--white);
-  border-width: 0;
-  background-color: var(--green);
-  border-radius: 10px;
-  padding: 4px 8px 4px 8px;
-  margin: 0 10px 0 0;
-  cursor: pointer;
-}
-.row2{
-  position: relative;
-  top: 10px;
-  right: -560px;
+form {
   display: flex;
-  width: 0%;
-  flex-direction: row;
+  flex-direction: column;
+  gap: 18px;
 }
-.box{
-  background-color: var(--white);
-  border-radius: 15px;
-}
-.heading{
-  color: var(--dark);
-  font-size: 20px;
-  font-weight: 500;
-  padding: 5px 0 0 20px; 
-  text-align: left; 
-}
-.row{
+.field {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 }
-hr{
-  border: none;
-  border-top: 2px solid var(--dark);
-  margin-bottom: 15px;
-}
-img{
-  padding: 3px 0 0 0;
-  height: 22px;
-}
-.btn{
-  text-align: center;
-  border-width: 1px;
-  border: solid;
-  border-color: var(--dark);
-  background-color: white;
-  border-radius: 8px;
-  width: 34px;
-  height: 28px;
-  cursor: pointer;
-  margin-right: 20px;
-  margin-left: 3px;
-}
-.long{
-  min-width: 600px;
-}
-form{
-  margin: 0 0 20px 20px;
-}
-input{
-  font-size: 20px;
-  border-radius: 10px;
-  padding: 2px 10px 2px 10px;
-  margin-bottom: 5px;
-}
-input:invalid{
-  border: 2px solid red;
-}
-.text{
-  color: var(--dark);
-  font-size: 20px;
-  text-align: left;
-}
-section {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background-color:var(--dark-op);
-  z-index: 1;
+.path-row {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 8px;
+  align-items: stretch;
+}
+.path-btn {
+  flex: 0 0 auto;
+  width: 40px;
+  height: auto;
+  align-self: stretch;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-2);
+}
+.path-btn:hover {
+  background: var(--surface-3);
+}
+.input-narrow {
+  max-width: 140px;
 }
 
+/* Toggle row */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.toggle-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  text-align: left;
+}
+.toggle-hint {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  margin-top: 2px;
+  text-align: left;
+}
+
+/* Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+  flex: 0 0 auto;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: var(--surface-3);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background: var(--text-dim);
+  border-radius: 50%;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+.switch input:checked + .slider {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+}
+.switch input:checked + .slider::before {
+  transform: translateX(18px);
+  background: var(--accent);
+}
 </style>

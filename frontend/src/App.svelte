@@ -86,9 +86,13 @@
   {#if selectedWindow}
     <svelte:component this={imported[$selectedWindow]} />
   {/if}
-  <section class="header">
-    <div class="Settings" title="Settings" on:click="{openSettings}" on:keydown><img src="{sliders}" alt="sliders"><p>Settings</p></div>
-  </section>
+  <header class="topbar">
+    <h1 class="topbar-title">Distributions</h1>
+    <button class="settings-btn" title="Settings" on:click="{openSettings}">
+      <img src="{sliders}" alt="">
+      <span>Settings</span>
+    </button>
+  </header>
   <WslList/>
   {#if $settings.ShowConsole}
     <section class="console-section">
@@ -100,67 +104,76 @@
 
 <style>
 
+main {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.topbar-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.settings-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px 8px 11px;
+  color: var(--text-dim);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.settings-btn:hover {
+  background: var(--surface-3);
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+.settings-btn img {
+  height: 17px;
+  width: 17px;
+  filter: invert(88%) sepia(8%) saturate(1480%) hue-rotate(178deg) brightness(106%) contrast(104%);
+}
+
 /* Console */
-.console-section{
+.console-section {
+  flex: 0 0 auto;
   position: absolute;
-  bottom: 0px;
+  bottom: 0;
   left: 0;
   width: 100%;
 }
-#console-resizer{
-  background-color: var(--gray);
+#console-resizer {
+  background-color: var(--border);
   width: 100%;
   height: 4px;
+  transition: background-color 0.12s ease;
 }
-#console-resizer:hover{
+#console-resizer:hover {
   cursor: ns-resize;
+  background-color: var(--accent);
 }
-#console{
+#console {
   width: 100%;
   overflow: auto;
-  background-color: black;
+  background-color: #0a0d12;
+  border-top: 1px solid var(--border);
   height: 75px;
-}
-::-webkit-scrollbar {
-  width: 7px;
-}
-::-webkit-scrollbar-track {
-  background: hwb(0 0% 100%);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--white);
-  border-radius: 5px;
-}
-
-
-
-.header{
-  margin-bottom: 50px;
-  display: flex;
-  justify-content: space-between;
-}
-img{
-    height: 25px;
-    filter: invert(88%) sepia(8%) saturate(1480%) hue-rotate(178deg) brightness(106%) contrast(104%);
-}
-.Settings{
-  border-radius: 0 0 15px 0;
-}
-.Settings>p{
-  color: var(--white);
-  font-size: 20px;
-  margin: 10px 0 10px 5px;
-  font-weight: 500;
-}
-.header>div{
-  display: flex;
-  flex-direction: row;
-  align-items: center;;
-  padding-left: 15px;
-  padding-right: 15px;
-  background-color: var(--green-light);
-}
-.header>div:hover{
-  cursor: pointer;
 }
 </style>

@@ -19,17 +19,22 @@
 
 <style>
 section{
-  color: white;
-  font-family: Consolas;
-  font-size: 14px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.5;
   height: 100%;
   overflow-wrap: break-word;
+  padding: 6px 0;
 }
 p{
-  position: left;
   text-align: left;
-  padding: 0 5px 0 5px;
-  margin: 0 0 0 0;
+  padding: 1px 10px;
+  margin: 0;
+}
+p:hover{
+  background: rgba(148, 163, 184, 0.06);
+  color: var(--text);
 }
 
 </style>
