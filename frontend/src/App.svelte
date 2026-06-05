@@ -5,6 +5,7 @@
   import sliders from './assets/sliders.svg'
   import Console from './Console.svelte'
   import {GetSettings} from '../wailsjs/go/main/App.js'
+  import {parseJsonWithUUIDs} from './utils'
 
   import BackupCreate from './BackupCreate.svelte'
   import BackupList from './BackupList.svelte'
@@ -66,11 +67,7 @@
   })
 
   EventsOn("refreshWSL",(result)=>{
-    let jsonObj=JSON.parse(result)
-    $distros=jsonObj.map((obj)=>{
-      obj.uuid=crypto.randomUUID()
-      return obj
-    })      
+    $distros=parseJsonWithUUIDs(result)    
   })
 
   EventsOn("openWslShutdown",()=>{

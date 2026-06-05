@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"os"
 	"os/exec"
 	"strconv"
@@ -13,6 +12,8 @@ import (
 	"golang.org/x/sys/windows/registry"
 )
 
+const pathSeparator = "\\"
+
 func runCommand(name string, args ...string) *exec.Cmd {
 	cmd := exec.Command(name, args...)
 	cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: 0x08000000}
@@ -20,10 +21,7 @@ func runCommand(name string, args ...string) *exec.Cmd {
 }
 
 func (a *App) TerminateWsl(name string) {
-	_, err := runCommand("wsl", "-t", name).Output()
-	if err != nil {
-		a.log(2, "Cannot terminate wsl ("+name+"): "+err.Error())
-	}
+	a.runAndLogError("Cannot terminate wsl ("+name+")", "wsl", "-t", name)
 }
 
 func removeEmptyChars(str string) string {
@@ -75,14 +73,12 @@ func (a *App) getWslList() string {
 		wslLines = append(wslLines, wslLine{default_, name, status, wsl_version})
 	}
 
-	jsonWsl, _ := json.Marshal(wslLines)
-
-	return string(jsonWsl)
+	return toJSON(wslLines)
 }
 
 func (a *App) CreateBackupFile(name string, filename string, breaker int) {
-	backupPath := currentSettings.BackupPath + "\\" + name
-	backupFile := backupPath + "\\" + filename
+	backupPath := backupDir(name)
+	backupFile := backupFilePath(name, filename)
 
 	if _, err := os.ReadDir(backupPath); err != nil {
 		a.log(1, "Cannot open backup folder ("+backupPath+"): "+err.Error())
@@ -117,8 +113,7 @@ type myfile struct {
 }
 
 func (a *App) GetBackupFiles(name string) string {
-	backupPath := currentSettings.BackupPath + "\\" + name
-	out, _ := os.ReadDir(backupPath)
+	out, _ := os.ReadDir(backupDir(name))
 	backupFiles := make([]myfile, 0)
 	for _, item := range out {
 		name := item.Name()
@@ -129,14 +124,12 @@ func (a *App) GetBackupFiles(name string) string {
 		file := myfile{name, fmodDate, modDate.Unix()}
 		backupFiles = append(backupFiles, file)
 	}
-	jsonStr, _ := json.Marshal(backupFiles)
-	return string(jsonStr)
+	return toJSON(backupFiles)
 }
 
 func (a *App) RenameBackupFile(name string, newName string, distroName string) {
-	backupPath := currentSettings.BackupPath + "\\" + distroName
-	backupFile := backupPath + "\\" + name
-	newBackupFile := backupPath + "\\" + newName
+	backupFile := backupFilePath(distroName, name)
+	newBackupFile := backupFilePath(distroName, newName)
 
 	if _, err := os.ReadFile(newBackupFile); err == nil {
 		a.log(2, "("+newBackupFile+")"+" already exists")
@@ -154,11 +147,8 @@ func (a *App) RenameBackupFile(name string, newName string, distroName string) {
 }
 
 func (a *App) OpenBackupFolder(distroName string) {
-	backupPath := currentSettings.BackupPath + "\\" + distroName
-	_, err := runCommand("explorer", backupPath).Output()
-	if err != nil {
-		a.log(2, "Cannot open backup folder ("+backupPath+"): "+err.Error())
-	}
+	path := backupDir(distroName)
+	a.runAndLogError("Cannot open backup folder ("+path+")", "explorer", path)
 }
 
 func (a *App) getDistroPath(disroName string) string {
@@ -202,8 +192,8 @@ func (a *App) RestoreDistro(filename string, disroName string) {
 	if dPath == "" {
 		return
 	}
-	ext4FileLocation := "'" + dPath + `\` + "ext4.vhdx" + "'"
-	bakFile := "'" + dPath + `\` + "ext4.vhdx.bak" + "'"
+	ext4FileLocation := "'" + dPath + pathSeparator + "ext4.vhdx" + "'"
+	bakFile := "'" + dPath + pathSeparator + "ext4.vhdx.bak" + "'"
 
 	for i := 0; i < 2; i++ {
 		if i == 1 {
@@ -222,7 +212,7 @@ func (a *App) RestoreDistro(filename string, disroName string) {
 		}
 	}
 
-	restoreFile := "'" + currentSettings.BackupPath + "\\" + disroName + "\\" + filename + "'"
+	restoreFile := "'" + backupFilePath(disroName, filename) + "'"
 	_, err := runCommand("powershell", "-Command", "Copy-Item", restoreFile, ext4FileLocation).Output()
 	if err != nil {
 		a.log(2, "Cannot copy ("+restoreFile+") to ("+ext4FileLocation+"): "+err.Error())
@@ -240,10 +230,7 @@ func (a *App) RestoreDistro(filename string, disroName string) {
 
 func (a *App) shutdownWsl() {
 	a.log(1, "WSL shutting down")
-	_, err := runCommand("wsl", "--shutdown").Output()
-	if err != nil {
-		a.log(2, "WSL shutdown error: "+err.Error())
-	}
+	a.runAndLogError("WSL shutdown error", "wsl", "--shutdown")
 }
 
 func (a *App) openWslShutdownWindow(c chan bool) {
@@ -278,8 +265,5 @@ func (a *App) RequestShutdownWsl() bool {
 }
 
 func (a *App) LaunchDistro(name string) {
-	_, err := runCommand("cmd", "/c", "start", "wsl", "-d", name, "--cd", "~").Output()
-	if err != nil {
-		a.log(2, "Cannot launch ("+name+"): "+err.Error())
-	}
+	a.runAndLogError("Cannot launch ("+name+")", "cmd", "/c", "start", "wsl", "-d", name, "--cd", "~")
 }
