@@ -1,11 +1,10 @@
+//go:build windows
+
 package main
 
 import (
-	"encoding/json"
 	"os"
 	"os/exec"
-	"strconv"
-	"strings"
 	"syscall"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -26,58 +25,10 @@ func (a *App) TerminateWsl(name string) {
 	}
 }
 
-func removeEmptyChars(str string) string {
-	newArr := make([]byte, 0)
-	for _, letter := range str {
-		if letter == 0 {
-			continue
-		}
-		newArr = append(newArr, byte(letter))
-	}
-	return string(newArr)
-}
-
 func (a *App) getWslList() string {
-	type wslLine struct {
-		Default_    bool
-		Name        string
-		Status      string
-		Wsl_version int
-	}
-
 	out, _ := runCommand("wsl", "-l", "-v").Output()
-
 	commandStr := removeEmptyChars(string(out))
-	rows := strings.Split(commandStr, "\n")
-
-	nameStart := strings.Index(rows[0], "NAME")
-	stateStart := strings.Index(rows[0], "STATE")
-	versionStart := strings.Index(rows[0], "VERSION")
-
-	// json umwandeln
-	wslLines := make([]wslLine, 0)
-	for _, line := range rows[1:] {
-		if len(line) < 2 {
-			continue
-		}
-		var default_ bool
-		if string(line[0]) == "*" {
-			default_ = true
-		} else {
-			default_ = false
-		}
-
-		name := strings.Trim(string(line[nameStart:stateStart]), " ")
-		status := strings.Trim(string(line[stateStart:versionStart]), " ")
-		wsl_versionStr := strings.Trim(string(line[versionStart:]), " ")
-		wsl_versionStr = strings.Replace(wsl_versionStr, "\r", "", 1)
-		wsl_version, _ := strconv.Atoi(wsl_versionStr)
-		wslLines = append(wslLines, wslLine{default_, name, status, wsl_version})
-	}
-
-	jsonWsl, _ := json.Marshal(wslLines)
-
-	return string(jsonWsl)
+	return parseWslListOutput(commandStr)
 }
 
 func (a *App) CreateBackupFile(name string, filename string, breaker int) {
@@ -108,12 +59,6 @@ func (a *App) CreateBackupFile(name string, filename string, breaker int) {
 			a.CreateBackupFile(name, filename, breaker)
 		}
 	}
-}
-
-type myfile struct {
-	Name       string
-	ModDate    string
-	ModDateInt int64
 }
 
 func (a *App) GetBackupFiles(name string) string {
