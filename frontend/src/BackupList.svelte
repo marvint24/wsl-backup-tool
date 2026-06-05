@@ -3,6 +3,8 @@
   import {selectedWindow,selectedDistro,backupRenameWindow} from './store'
   import BackupListRow from './BackupListRow.svelte'
   import BackupRename from './BackupRename.svelte'
+  import Modal from './Modal.svelte'
+  import {parseJsonWithUUIDs} from './utils'
   import folder from "./assets/folder.svg";
 
   function close(){
@@ -12,11 +14,7 @@
   var backupFiles=[]
   function listBackupFiles(){
     GetBackupFiles($selectedDistro).then((result)=>{
-      let jsonObj=JSON.parse(result)
-      backupFiles=jsonObj.map((obj)=>{
-        obj.uuid=crypto.randomUUID()
-        return obj
-      }) 
+      backupFiles=parseJsonWithUUIDs(result)
       backupFiles=backupFiles.sort((a,b)=>{
         if(a.ModDateInt>b.ModDateInt){
           return -1
@@ -41,39 +39,34 @@
   
   
   
-<section class="window">
+<Modal heading="Manage backup files for {$selectedDistro}">
   {#if $backupRenameWindow.name != null}
     <BackupRename/>
   {/if}
-  <div>
-    <div class="box">
-      <div class="heading">Manage backup files for {$selectedDistro}</div>
-      <hr/>
-      <section>
-        {#if backupFiles.length!=0}
-        <div class="scroll">
-          <table>
-              <tr>
-                <td>Name</td>
-                <td>Created</td>
-                <td><div class="btn" title="Open folder" on:click="{openFolder}" on:keydown><img src="{folder}" alt="folder"></div></td>
-              </tr>
-                {#each backupFiles as item (item.uuid)}
-                  <BackupListRow backupFile={item}/>
-                {/each}
-          </table>
-        </div>
-        {:else}
-          <p>There are no files {":("}</p>
-        {/if}
-      </section>
-
-    </div>
-    <div class="row2">
-      <div class="mbtn" on:click="{close}" on:keydown>Close</div>
-    </div>
+  <div slot="content">
+    <section>
+      {#if backupFiles.length!=0}
+      <div class="scroll">
+        <table>
+            <tr>
+              <td>Name</td>
+              <td>Created</td>
+              <td><div class="btn" title="Open folder" on:click="{openFolder}" on:keydown><img src="{folder}" alt="folder"></div></td>
+            </tr>
+              {#each backupFiles as item (item.uuid)}
+                <BackupListRow backupFile={item}/>
+              {/each}
+        </table>
+      </div>
+      {:else}
+        <p>There are no files {":("}</p>
+      {/if}
+    </section>
   </div>
-</section>
+  <div slot="actions">
+    <div class="mbtn" on:click="{close}" on:keydown>Close</div>
+  </div>
+</Modal>
 
 
 <style>
@@ -94,7 +87,6 @@ section {
   background: var(--dark);
   border-radius: 5px;
 }
-
 img{
   padding: 3px 0 0 0;
   height: 22px;
@@ -142,41 +134,4 @@ td:nth-child(3){
   margin: 0 10px 0 0;
   cursor: pointer;
 }
-.row2{
-  position: relative;
-  top: 10px;
-  margin-left: auto; 
-  margin-right: 80px;
-  display: flex;
-  width: 0%;
-  flex-direction: row;
-}
-.box{
-  background-color: var(--white);
-  border-radius: 15px;
-  width: 95vw;
-}
-.heading{
-  color: var(--dark);
-  font-size: 20px;
-  font-weight: 500;
-  padding: 5px 0 0 25px; 
-  text-align: left;
-  white-space: nowrap 
-}
-hr{
-  border: none;
-  border-top: 2px solid var(--dark);
-  margin-bottom: 15px;
-}
-.window {
-  position: absolute;
-  width: calc(100% - 10px);
-  height: 100%;
-  background-color:var(--dark-op);
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-  </style>
+</style>

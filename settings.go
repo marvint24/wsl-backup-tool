@@ -8,6 +8,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
+
 type settingsType struct {
 	BackupPath      string
 	RefreshInterval int
@@ -15,8 +16,7 @@ type settingsType struct {
 }
 
 func (settings *settingsType) toString() string {
-	jsonStr, _ := json.Marshal(settings)
-	return string(jsonStr)
+	return toJSON(settings)
 }
 
 func (a *App) saveSettings(settings settingsType) {
