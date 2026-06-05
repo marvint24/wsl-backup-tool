@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 	"strconv"
@@ -19,11 +20,13 @@ func runCommand(name string, args ...string) *exec.Cmd {
 	return cmd
 }
 
-func (a *App) TerminateWsl(name string) {
+func (a *App) TerminateWsl(name string) error {
 	_, err := runCommand("wsl", "-t", name).Output()
 	if err != nil {
 		a.log(2, "Cannot terminate wsl ("+name+"): "+err.Error())
+		return fmt.Errorf("cannot terminate WSL distro %s: %w", name, err)
 	}
+	return nil
 }
 
 func removeEmptyChars(str string) string {
@@ -37,7 +40,7 @@ func removeEmptyChars(str string) string {
 	return string(newArr)
 }
 
-func (a *App) getWslList() string {
+func (a *App) getWslList() (string, error) {
 	type wslLine struct {
 		Default_    bool
 		Name        string
@@ -45,16 +48,28 @@ func (a *App) getWslList() string {
 		Wsl_version int
 	}
 
-	out, _ := runCommand("wsl", "-l", "-v").Output()
+	out, err := runCommand("wsl", "-l", "-v").Output()
+	if err != nil {
+		a.log(2, "Cannot get WSL list: "+err.Error())
+		return "[]", fmt.Errorf("cannot get WSL list: %w", err)
+	}
 
 	commandStr := removeEmptyChars(string(out))
 	rows := strings.Split(commandStr, "\n")
+
+	if len(rows) == 0 {
+		return "[]", nil
+	}
 
 	nameStart := strings.Index(rows[0], "NAME")
 	stateStart := strings.Index(rows[0], "STATE")
 	versionStart := strings.Index(rows[0], "VERSION")
 
-	// json umwandeln
+	if nameStart == -1 || stateStart == -1 || versionStart == -1 {
+		a.log(1, "Unexpected WSL output format: "+rows[0])
+		return "[]", fmt.Errorf("unexpected WSL output format")
+	}
+
 	wslLines := make([]wslLine, 0)
 	for _, line := range rows[1:] {
 		if len(line) < 2 {
@@ -67,20 +82,33 @@ func (a *App) getWslList() string {
 			default_ = false
 		}
 
+		if len(line) < versionStart+1 {
+			a.log(1, "Skipping malformed WSL output line: "+line)
+			continue
+		}
+
 		name := strings.Trim(string(line[nameStart:stateStart]), " ")
 		status := strings.Trim(string(line[stateStart:versionStart]), " ")
 		wsl_versionStr := strings.Trim(string(line[versionStart:]), " ")
 		wsl_versionStr = strings.Replace(wsl_versionStr, "\r", "", 1)
-		wsl_version, _ := strconv.Atoi(wsl_versionStr)
+		wsl_version, err := strconv.Atoi(wsl_versionStr)
+		if err != nil {
+			a.log(1, "Cannot parse WSL version '"+wsl_versionStr+"': "+err.Error())
+			wsl_version = 0
+		}
 		wslLines = append(wslLines, wslLine{default_, name, status, wsl_version})
 	}
 
-	jsonWsl, _ := json.Marshal(wslLines)
+	jsonWsl, err := json.Marshal(wslLines)
+	if err != nil {
+		a.log(2, "Cannot marshal WSL list: "+err.Error())
+		return "[]", fmt.Errorf("cannot marshal WSL list: %w", err)
+	}
 
-	return string(jsonWsl)
+	return string(jsonWsl), nil
 }
 
-func (a *App) CreateBackupFile(name string, filename string, breaker int) {
+func (a *App) CreateBackupFile(name string, filename string, breaker int) error {
 	backupPath := currentSettings.BackupPath + "\\" + name
 	backupFile := backupPath + "\\" + filename
 
@@ -88,6 +116,7 @@ func (a *App) CreateBackupFile(name string, filename string, breaker int) {
 		a.log(1, "Cannot open backup folder ("+backupPath+"): "+err.Error())
 		if err := os.MkdirAll(backupPath, os.ModePerm); err != nil {
 			a.log(2, "Cannot create backup folder ("+backupPath+"): "+err.Error())
+			return fmt.Errorf("cannot create backup folder: %w", err)
 		}
 	}
 
@@ -98,16 +127,15 @@ func (a *App) CreateBackupFile(name string, filename string, breaker int) {
 	if err != nil {
 		a.log(2, "WSL export error ("+backupFile+"): "+err.Error())
 		if breaker >= 1 {
-			return
-		} else {
-			if !a.RequestShutdownWsl() {
-				return
-			}
-
-			breaker++
-			a.CreateBackupFile(name, filename, breaker)
+			return fmt.Errorf("WSL export failed after retry: %w", err)
 		}
+		if !a.RequestShutdownWsl() {
+			return fmt.Errorf("WSL shutdown canceled by user")
+		}
+		breaker++
+		return a.CreateBackupFile(name, filename, breaker)
 	}
+	return nil
 }
 
 type myfile struct {
@@ -116,91 +144,112 @@ type myfile struct {
 	ModDateInt int64
 }
 
-func (a *App) GetBackupFiles(name string) string {
+func (a *App) GetBackupFiles(name string) (string, error) {
 	backupPath := currentSettings.BackupPath + "\\" + name
-	out, _ := os.ReadDir(backupPath)
+	out, err := os.ReadDir(backupPath)
+	if err != nil {
+		a.log(2, "Cannot read backup directory ("+backupPath+"): "+err.Error())
+		return "[]", fmt.Errorf("cannot read backup directory: %w", err)
+	}
 	backupFiles := make([]myfile, 0)
 	for _, item := range out {
-		name := item.Name()
-		info, _ := item.Info()
+		itemName := item.Name()
+		info, err := item.Info()
+		if err != nil {
+			a.log(1, "Cannot get file info for "+itemName+": "+err.Error())
+			continue
+		}
 		modDate := info.ModTime()
 		fmodDate := modDate.Format("02.01.2006 15:04")
 
-		file := myfile{name, fmodDate, modDate.Unix()}
+		file := myfile{itemName, fmodDate, modDate.Unix()}
 		backupFiles = append(backupFiles, file)
 	}
-	jsonStr, _ := json.Marshal(backupFiles)
-	return string(jsonStr)
+	jsonStr, err := json.Marshal(backupFiles)
+	if err != nil {
+		a.log(2, "Cannot marshal backup files: "+err.Error())
+		return "[]", fmt.Errorf("cannot marshal backup files: %w", err)
+	}
+	return string(jsonStr), nil
 }
 
-func (a *App) RenameBackupFile(name string, newName string, distroName string) {
+func (a *App) RenameBackupFile(name string, newName string, distroName string) error {
 	backupPath := currentSettings.BackupPath + "\\" + distroName
 	backupFile := backupPath + "\\" + name
 	newBackupFile := backupPath + "\\" + newName
 
 	if _, err := os.ReadFile(newBackupFile); err == nil {
 		a.log(2, "("+newBackupFile+")"+" already exists")
-		return
+		return fmt.Errorf("file already exists: %s", newBackupFile)
 	}
 
 	err := os.Rename(backupFile, newBackupFile)
 	if err != nil {
 		a.log(2, "Cannot rename ("+backupFile+") to ("+newBackupFile+"): "+err.Error())
-		return
+		return fmt.Errorf("cannot rename backup file: %w", err)
 	}
 
 	a.log(0, "Renamed: ("+backupFile+") to ("+newBackupFile+")")
-
+	return nil
 }
 
-func (a *App) OpenBackupFolder(distroName string) {
+func (a *App) OpenBackupFolder(distroName string) error {
 	backupPath := currentSettings.BackupPath + "\\" + distroName
 	_, err := runCommand("explorer", backupPath).Output()
 	if err != nil {
 		a.log(2, "Cannot open backup folder ("+backupPath+"): "+err.Error())
+		return fmt.Errorf("cannot open backup folder: %w", err)
 	}
+	return nil
 }
 
-func (a *App) getDistroPath(disroName string) string {
+func (a *App) getDistroPath(distroName string) (string, error) {
 	regPath := `Software\Microsoft\Windows\CurrentVersion\Lxss`
 	lxss, err := registry.OpenKey(registry.CURRENT_USER, regPath, registry.READ)
 	if err != nil {
 		a.log(2, "Cannot open registry path ("+regPath+"): "+err.Error())
+		return "", fmt.Errorf("cannot open registry path: %w", err)
 	}
 	defer lxss.Close()
 
 	distros, err := lxss.ReadSubKeyNames(0)
 	if err != nil {
 		a.log(2, "Cannot read sub keys ("+regPath+"): "+err.Error())
+		return "", fmt.Errorf("cannot read registry sub keys: %w", err)
 	}
 
 	for _, key := range distros {
 		skey, err := registry.OpenKey(registry.CURRENT_USER, regPath+`\`+key, registry.QUERY_VALUE)
 		if err != nil {
-			a.log(2, "Cannot open registry key ("+regPath+`\`+key+"): "+err.Error())
+			a.log(1, "Cannot open registry key ("+regPath+`\`+key+"): "+err.Error())
+			continue
 		}
-		defer skey.Close()
 
 		name, _, err := skey.GetStringValue("DistributionName")
 		if err != nil {
-			a.log(2, "Cannot get DistributionName ("+regPath+`\`+key+"): "+err.Error())
+			a.log(1, "Cannot get DistributionName ("+regPath+`\`+key+"): "+err.Error())
+			skey.Close()
+			continue
 		}
 
-		if name == disroName {
+		if name == distroName {
 			ext4FileLocation, _, err := skey.GetStringValue("BasePath")
+			skey.Close()
 			if err != nil {
 				a.log(2, "Cannot get BasePath ("+regPath+`\`+key+"): "+err.Error())
+				return "", fmt.Errorf("cannot get BasePath: %w", err)
 			}
-			return ext4FileLocation
+			return ext4FileLocation, nil
 		}
+		skey.Close()
 	}
-	return ""
+	return "", fmt.Errorf("distro not found: %s", distroName)
 }
 
-func (a *App) RestoreDistro(filename string, disroName string) {
-	dPath := a.getDistroPath(disroName)
-	if dPath == "" {
-		return
+func (a *App) RestoreDistro(filename string, distroName string) error {
+	dPath, err := a.getDistroPath(distroName)
+	if err != nil {
+		return fmt.Errorf("cannot find distro path for %s: %w", distroName, err)
 	}
 	ext4FileLocation := "'" + dPath + `\` + "ext4.vhdx" + "'"
 	bakFile := "'" + dPath + `\` + "ext4.vhdx.bak" + "'"
@@ -208,34 +257,34 @@ func (a *App) RestoreDistro(filename string, disroName string) {
 	for i := 0; i < 2; i++ {
 		if i == 1 {
 			if !a.RequestShutdownWsl() {
-				return
+				return fmt.Errorf("WSL shutdown canceled by user")
 			}
 		}
 		_, err := runCommand("powershell", "-Command", "Rename-Item", ext4FileLocation, bakFile).Output()
 		if err != nil {
 			a.log(2, "Cannot rename ("+ext4FileLocation+"): "+err.Error())
 			if i == 1 {
-				return
+				return fmt.Errorf("cannot rename ext4 file: %w", err)
 			}
 		} else {
 			break
 		}
 	}
 
-	restoreFile := "'" + currentSettings.BackupPath + "\\" + disroName + "\\" + filename + "'"
-	_, err := runCommand("powershell", "-Command", "Copy-Item", restoreFile, ext4FileLocation).Output()
+	restoreFile := "'" + currentSettings.BackupPath + "\\" + distroName + "\\" + filename + "'"
+	_, err = runCommand("powershell", "-Command", "Copy-Item", restoreFile, ext4FileLocation).Output()
 	if err != nil {
 		a.log(2, "Cannot copy ("+restoreFile+") to ("+ext4FileLocation+"): "+err.Error())
-		return
+		return fmt.Errorf("cannot copy backup file: %w", err)
 	}
 
-	_, err2 := runCommand("powershell", "-Command", "Remove-Item", bakFile).Output()
-	if err2 != nil {
-		a.log(2, "Cannot delete ("+bakFile+"): "+err.Error())
+	_, err = runCommand("powershell", "-Command", "Remove-Item", bakFile).Output()
+	if err != nil {
+		a.log(1, "Cannot delete backup file ("+bakFile+"): "+err.Error())
 	}
 
 	a.log(0, "Restored: ("+restoreFile+") to ("+ext4FileLocation+")")
-
+	return nil
 }
 
 func (a *App) shutdownWsl() {
@@ -277,9 +326,11 @@ func (a *App) RequestShutdownWsl() bool {
 	}
 }
 
-func (a *App) LaunchDistro(name string) {
+func (a *App) LaunchDistro(name string) error {
 	_, err := runCommand("cmd", "/c", "start", "wsl", "-d", name, "--cd", "~").Output()
 	if err != nil {
 		a.log(2, "Cannot launch ("+name+"): "+err.Error())
+		return fmt.Errorf("cannot launch distro %s: %w", name, err)
 	}
+	return nil
 }
