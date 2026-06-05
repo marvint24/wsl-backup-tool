@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"syscall"
@@ -19,7 +21,41 @@ func runCommand(name string, args ...string) *exec.Cmd {
 	return cmd
 }
 
+func isCleanPathComponent(name string) bool {
+	if name == "" || name == "." || name == ".." {
+		return false
+	}
+	if strings.ContainsAny(name, `\/`) {
+		return false
+	}
+	if strings.Contains(name, "..") {
+		return false
+	}
+	return true
+}
+
+func copyFile(src, dst string) error {
+	sourceFile, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer sourceFile.Close()
+
+	destFile, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer destFile.Close()
+
+	_, err = io.Copy(destFile, sourceFile)
+	return err
+}
+
 func (a *App) TerminateWsl(name string) {
+	if !isCleanPathComponent(name) {
+		a.log(2, "Invalid distro name")
+		return
+	}
 	_, err := runCommand("wsl", "-t", name).Output()
 	if err != nil {
 		a.log(2, "Cannot terminate wsl ("+name+"): "+err.Error())
@@ -81,8 +117,12 @@ func (a *App) getWslList() string {
 }
 
 func (a *App) CreateBackupFile(name string, filename string, breaker int) {
-	backupPath := currentSettings.BackupPath + "\\" + name
-	backupFile := backupPath + "\\" + filename
+	if !isCleanPathComponent(name) || !isCleanPathComponent(filename) {
+		a.log(2, "Invalid distro name or filename")
+		return
+	}
+	backupPath := filepath.Join(currentSettings.BackupPath, name)
+	backupFile := filepath.Join(backupPath, filename)
 
 	if _, err := os.ReadDir(backupPath); err != nil {
 		a.log(1, "Cannot open backup folder ("+backupPath+"): "+err.Error())
@@ -117,7 +157,11 @@ type myfile struct {
 }
 
 func (a *App) GetBackupFiles(name string) string {
-	backupPath := currentSettings.BackupPath + "\\" + name
+	if !isCleanPathComponent(name) {
+		a.log(2, "Invalid distro name")
+		return "[]"
+	}
+	backupPath := filepath.Join(currentSettings.BackupPath, name)
 	out, _ := os.ReadDir(backupPath)
 	backupFiles := make([]myfile, 0)
 	for _, item := range out {
@@ -134,9 +178,13 @@ func (a *App) GetBackupFiles(name string) string {
 }
 
 func (a *App) RenameBackupFile(name string, newName string, distroName string) {
-	backupPath := currentSettings.BackupPath + "\\" + distroName
-	backupFile := backupPath + "\\" + name
-	newBackupFile := backupPath + "\\" + newName
+	if !isCleanPathComponent(name) || !isCleanPathComponent(newName) || !isCleanPathComponent(distroName) {
+		a.log(2, "Invalid name, new name, or distro name")
+		return
+	}
+	backupPath := filepath.Join(currentSettings.BackupPath, distroName)
+	backupFile := filepath.Join(backupPath, name)
+	newBackupFile := filepath.Join(backupPath, newName)
 
 	if _, err := os.ReadFile(newBackupFile); err == nil {
 		a.log(2, "("+newBackupFile+")"+" already exists")
@@ -154,7 +202,11 @@ func (a *App) RenameBackupFile(name string, newName string, distroName string) {
 }
 
 func (a *App) OpenBackupFolder(distroName string) {
-	backupPath := currentSettings.BackupPath + "\\" + distroName
+	if !isCleanPathComponent(distroName) {
+		a.log(2, "Invalid distro name")
+		return
+	}
+	backupPath := filepath.Join(currentSettings.BackupPath, distroName)
 	_, err := runCommand("explorer", backupPath).Output()
 	if err != nil {
 		a.log(2, "Cannot open backup folder ("+backupPath+"): "+err.Error())
@@ -198,12 +250,17 @@ func (a *App) getDistroPath(disroName string) string {
 }
 
 func (a *App) RestoreDistro(filename string, disroName string) {
+	if !isCleanPathComponent(filename) || !isCleanPathComponent(disroName) {
+		a.log(2, "Invalid filename or distro name")
+		return
+	}
+
 	dPath := a.getDistroPath(disroName)
 	if dPath == "" {
 		return
 	}
-	ext4FileLocation := "'" + dPath + `\` + "ext4.vhdx" + "'"
-	bakFile := "'" + dPath + `\` + "ext4.vhdx.bak" + "'"
+	ext4FilePath := filepath.Join(dPath, "ext4.vhdx")
+	bakFilePath := filepath.Join(dPath, "ext4.vhdx.bak")
 
 	for i := 0; i < 2; i++ {
 		if i == 1 {
@@ -211,9 +268,9 @@ func (a *App) RestoreDistro(filename string, disroName string) {
 				return
 			}
 		}
-		_, err := runCommand("powershell", "-Command", "Rename-Item", ext4FileLocation, bakFile).Output()
+		err := os.Rename(ext4FilePath, bakFilePath)
 		if err != nil {
-			a.log(2, "Cannot rename ("+ext4FileLocation+"): "+err.Error())
+			a.log(2, "Cannot rename ("+ext4FilePath+"): "+err.Error())
 			if i == 1 {
 				return
 			}
@@ -222,20 +279,19 @@ func (a *App) RestoreDistro(filename string, disroName string) {
 		}
 	}
 
-	restoreFile := "'" + currentSettings.BackupPath + "\\" + disroName + "\\" + filename + "'"
-	_, err := runCommand("powershell", "-Command", "Copy-Item", restoreFile, ext4FileLocation).Output()
+	restoreFile := filepath.Join(currentSettings.BackupPath, disroName, filename)
+	err := copyFile(restoreFile, ext4FilePath)
 	if err != nil {
-		a.log(2, "Cannot copy ("+restoreFile+") to ("+ext4FileLocation+"): "+err.Error())
+		a.log(2, "Cannot copy ("+restoreFile+") to ("+ext4FilePath+"): "+err.Error())
 		return
 	}
 
-	_, err2 := runCommand("powershell", "-Command", "Remove-Item", bakFile).Output()
+	err2 := os.Remove(bakFilePath)
 	if err2 != nil {
-		a.log(2, "Cannot delete ("+bakFile+"): "+err.Error())
+		a.log(2, "Cannot delete ("+bakFilePath+"): "+err2.Error())
 	}
 
-	a.log(0, "Restored: ("+restoreFile+") to ("+ext4FileLocation+")")
-
+	a.log(0, "Restored: ("+restoreFile+") to ("+ext4FilePath+")")
 }
 
 func (a *App) shutdownWsl() {
@@ -278,6 +334,10 @@ func (a *App) RequestShutdownWsl() bool {
 }
 
 func (a *App) LaunchDistro(name string) {
+	if !isCleanPathComponent(name) {
+		a.log(2, "Invalid distro name")
+		return
+	}
 	_, err := runCommand("cmd", "/c", "start", "wsl", "-d", name, "--cd", "~").Output()
 	if err != nil {
 		a.log(2, "Cannot launch ("+name+"): "+err.Error())

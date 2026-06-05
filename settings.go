@@ -20,7 +20,7 @@ func (settings *settingsType) toString() string {
 }
 
 func (a *App) saveSettings(settings settingsType) {
-	if err := os.WriteFile(settingsFileName, []byte(settings.toString()), os.ModePerm); err != nil {
+	if err := os.WriteFile(settingsFileName, []byte(settings.toString()), 0600); err != nil {
 		a.log(2, "Cannot save settings: "+err.Error())
 	}
 }
@@ -41,7 +41,7 @@ func (a *App) init() {
 	settingsFile, err := os.ReadFile(settingsFileName)
 	if err != nil {
 		a.log(1, "Cannot open settings file: "+err.Error())
-		if err := os.MkdirAll(settingsFolder, os.ModePerm); err != nil {
+		if err := os.MkdirAll(settingsFolder, 0700); err != nil {
 			a.log(2, "Cannot create settings path: "+err.Error())
 		} else {
 			defaultSettings()
@@ -49,7 +49,13 @@ func (a *App) init() {
 		}
 	}
 
-	json.Unmarshal(settingsFile, &currentSettings)
+	if err := json.Unmarshal(settingsFile, &currentSettings); err != nil {
+		a.log(1, "Cannot parse settings file: "+err.Error())
+		defaultSettings()
+	}
+	if currentSettings.RefreshInterval < 1 {
+		currentSettings.RefreshInterval = 1
+	}
 }
 
 func (a *App) automaticRefresh() {
@@ -77,7 +83,13 @@ func (a *App) onload() {
 // }
 
 func (a *App) SetSettings(settings string) {
-	json.Unmarshal([]byte(settings), &currentSettings)
+	if err := json.Unmarshal([]byte(settings), &currentSettings); err != nil {
+		a.log(2, "Invalid settings format: "+err.Error())
+		return
+	}
+	if currentSettings.RefreshInterval < 1 {
+		currentSettings.RefreshInterval = 1
+	}
 	a.saveSettings(currentSettings)
 }
 
