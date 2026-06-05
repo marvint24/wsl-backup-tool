@@ -8,17 +8,6 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-type settingsType struct {
-	BackupPath      string
-	RefreshInterval int
-	ShowConsole     bool
-}
-
-func (settings *settingsType) toString() string {
-	jsonStr, _ := json.Marshal(settings)
-	return string(jsonStr)
-}
-
 func (a *App) saveSettings(settings settingsType) {
 	if err := os.WriteFile(settingsFileName, []byte(settings.toString()), os.ModePerm); err != nil {
 		a.log(2, "Cannot save settings: "+err.Error())
@@ -29,12 +18,8 @@ var settingsFolder = os.Getenv("APPDATA") + "\\WSL_Backup_Tool.exe\\settings\\"
 var settingsFileName = settingsFolder + "settings.json"
 var currentSettings settingsType
 
-func defaultSettings() {
-	currentSettings = settingsType{
-		BackupPath:      "",
-		RefreshInterval: 2,
-		ShowConsole:     true,
-	}
+func setDefaultSettings() {
+	currentSettings = defaultSettings()
 }
 
 func (a *App) init() {
@@ -44,7 +29,7 @@ func (a *App) init() {
 		if err := os.MkdirAll(settingsFolder, os.ModePerm); err != nil {
 			a.log(2, "Cannot create settings path: "+err.Error())
 		} else {
-			defaultSettings()
+			setDefaultSettings()
 			a.saveSettings(currentSettings)
 		}
 	}
